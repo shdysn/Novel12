@@ -8,11 +8,9 @@ data class NovelDto(
     @Json(name = "id") val id: String,
     @Json(name = "title_urdu") val titleUrdu: String? = null,
     @Json(name = "title_english") val titleEnglish: String? = null,
-    @Json(name = "title") val title: String? = null, // fallback compatibility
     @Json(name = "author_id") val authorId: String? = null,
     @Json(name = "author") val author: String? = null,
     @Json(name = "description") val description: String? = null,
-    @Json(name = "synopsis") val synopsis: String? = null, // fallback compatibility
     @Json(name = "cover_image_url") val coverImageUrl: String? = null,
     @Json(name = "category_id") val categoryId: String? = null,
     @Json(name = "category") val category: String? = null,
@@ -25,8 +23,8 @@ data class NovelDto(
     @Json(name = "created_at") val createdAt: String? = null,
     @Json(name = "updated_at") val updatedAt: String? = null
 ) {
-    val displayTitle: String get() = titleUrdu?.ifBlank { null } ?: title ?: "اردو ناول"
-    val displayDescription: String get() = description?.ifBlank { null } ?: synopsis ?: ""
+    val displayTitle: String get() = titleUrdu?.ifBlank { null } ?: "اردو ناول"
+    val displayDescription: String get() = description?.ifBlank { null } ?: ""
     val isPublished: Boolean get() = publicationStatus.equals("published", ignoreCase = true)
 }
 
@@ -36,7 +34,6 @@ data class ChapterDto(
     @Json(name = "novel_id") val novelId: String,
     @Json(name = "chapter_number") val chapterNumber: Int,
     @Json(name = "chapter_title") val chapterTitle: String? = null,
-    @Json(name = "title") val title: String? = null, // fallback compatibility
     @Json(name = "content") val content: String,
     @Json(name = "word_count") val wordCount: Int = 0,
     @Json(name = "read_time_minutes") val readTimeMinutes: Int = 5,
@@ -44,7 +41,7 @@ data class ChapterDto(
     @Json(name = "created_at") val createdAt: String? = null,
     @Json(name = "updated_at") val updatedAt: String? = null
 ) {
-    val displayTitle: String get() = chapterTitle?.ifBlank { null } ?: title ?: "باب $chapterNumber"
+    val displayTitle: String get() = chapterTitle?.ifBlank { null } ?: "باب $chapterNumber"
     val isPublished: Boolean get() = publicationStatus.equals("published", ignoreCase = true)
 }
 
