@@ -64,6 +64,7 @@ import com.example.ui.components.NovelCoverCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +107,7 @@ fun ExploreScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "اردو ناولز ریڈر",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 24.sp,
                                 color = Color.White
@@ -120,7 +121,7 @@ fun ExploreScreen(
                         }
                         Text(
                             text = "شاہکار اردو ناول اب خالص یونیکوڈ متن میں",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 12.sp,
                             color = Color.White.copy(alpha = 0.85f),
                             modifier = Modifier.padding(top = 2.dp)
@@ -146,7 +147,7 @@ fun ExploreScreen(
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = if (supabaseConfig.isConnected) "کلاؤڈ آن" else "سپابیس",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = Color.White
                             )
@@ -166,7 +167,7 @@ fun ExploreScreen(
                     placeholder = {
                         Text(
                             text = "ناول کا نام یا مصنف تلاش کریں...",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -217,7 +218,7 @@ fun ExploreScreen(
             ) {
                 Text(
                     text = "اصناف (Categories)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -239,7 +240,7 @@ fun ExploreScreen(
                             label = {
                                 Text(
                                     text = category.urduName,
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                     fontSize = 13.sp
                                 )
@@ -268,7 +269,7 @@ fun ExploreScreen(
                     text = if (searchQuery.isNotBlank()) "نتائج برائے \"$searchQuery\" (${novels.size})"
                     else if (selectedCategory != NovelCategory.ALL) "${selectedCategory.urduName} ناولز (${novels.size})"
                     else "تمام مقبول ناولز (${novels.size})",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface
@@ -287,14 +288,14 @@ fun ExploreScreen(
                 ) {
                     Text(
                         text = "کوئی ناول نہیں ملا",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Text(
                         text = "کسی دوسرے نام سے تلاش کریں یا زمرہ تبدیل کریں",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.padding(top = 4.dp)
@@ -365,7 +366,7 @@ private fun FeaturedHeroBanner(
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "آج کا شاہکار انتخاب",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = GoldAccent,
                                 fontWeight = FontWeight.Bold
@@ -394,7 +395,7 @@ private fun FeaturedHeroBanner(
 
                 Text(
                     text = novel.title,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     color = Color.White
@@ -402,7 +403,7 @@ private fun FeaturedHeroBanner(
 
                 Text(
                     text = "مصنفہ: ${novel.author}  |  صنف: ${novel.category}",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
                     color = Color.White.copy(alpha = 0.85f),
                     modifier = Modifier.padding(vertical = 4.dp)
@@ -410,7 +411,7 @@ private fun FeaturedHeroBanner(
 
                 Text(
                     text = novel.synopsis,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.75f),
                     maxLines = 2,
@@ -442,7 +443,7 @@ private fun FeaturedHeroBanner(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "ابھی پڑھیں",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
@@ -450,7 +451,7 @@ private fun FeaturedHeroBanner(
 
                     Text(
                         text = "${novel.totalChapters} ابواب  •  خالص یونیکوڈ",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
                         color = Color.White.copy(alpha = 0.7f)
                     )

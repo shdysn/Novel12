@@ -69,6 +69,7 @@ import com.example.ui.components.NovelVerticalCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @Composable
@@ -125,7 +126,7 @@ fun HomeScreen(
                         ) {
                             Text(
                                 text = "ش",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 color = Color.White
@@ -137,13 +138,13 @@ fun HomeScreen(
                         Column {
                             Text(
                                 text = "خوش آمدید",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = Color.White.copy(alpha = 0.8f)
                             )
                             Text(
                                 text = "شاہد ثاقب",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
                                 color = Color.White
@@ -154,7 +155,7 @@ fun HomeScreen(
                     // App Title Center
                     Text(
                         text = "داستانِ نو",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = GoldAccent
@@ -200,14 +201,14 @@ fun HomeScreen(
                 Column {
                     Text(
                         text = "آج آپ کون سا شاہکار پڑھنا چاہیں گے؟",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         color = Color.White
                     )
                     Text(
                         text = "اردو ادب کا سب سے بڑا ڈیجیٹل کتب خانہ — خالص یونیکوڈ متن میں",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
                         color = Color.White.copy(alpha = 0.85f),
                         modifier = Modifier.padding(top = 2.dp)
@@ -325,7 +326,7 @@ fun HomeScreen(
                         label = {
                             Text(
                                 text = category.urduName,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
                             )
@@ -432,14 +433,14 @@ private fun HomeSectionHeader(
         Column {
             Text(
                 text = title,
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = subtitle,
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -448,7 +449,7 @@ private fun HomeSectionHeader(
         if (showAction) {
             Text(
                 text = actionText,
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 12.sp,
                 color = EmeraldPrimary,
@@ -511,7 +512,7 @@ private fun FeaturedNovelHero(
                         Text(
                             text = novel.title,
                             color = Color.White,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -521,7 +522,7 @@ private fun FeaturedNovelHero(
                         Text(
                             text = novel.author,
                             color = Color.White.copy(alpha = 0.85f),
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 9.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             maxLines = 1
@@ -539,7 +540,7 @@ private fun FeaturedNovelHero(
                     ) {
                         Text(
                             text = "آج کا شاہکار انتخاب",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp,
                             color = GoldAccent,
@@ -551,7 +552,7 @@ private fun FeaturedNovelHero(
 
                     Text(
                         text = novel.title,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 19.sp,
                         color = Color.White,
@@ -561,7 +562,7 @@ private fun FeaturedNovelHero(
 
                     Text(
                         text = "از ${novel.author}",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = GoldAccent,
                         modifier = Modifier.padding(vertical = 2.dp)
@@ -569,7 +570,7 @@ private fun FeaturedNovelHero(
 
                     Text(
                         text = novel.synopsis,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 11.sp,
                         color = Color.White.copy(alpha = 0.75f),
                         maxLines = 2,
@@ -601,7 +602,7 @@ private fun FeaturedNovelHero(
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "ابھی پڑھیں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp
                             )

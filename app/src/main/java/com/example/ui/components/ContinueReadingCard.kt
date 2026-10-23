@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -41,6 +40,7 @@ import com.example.data.model.Novel
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 
 @Composable
 fun ContinueReadingCard(
@@ -83,7 +83,7 @@ fun ContinueReadingCard(
                     Text(
                         text = novel.title,
                         color = Color.White,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp,
                         maxLines = 2,
@@ -97,7 +97,7 @@ fun ContinueReadingCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = novel.title,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -107,7 +107,7 @@ fun ContinueReadingCard(
 
                 Text(
                     text = novel.author,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1
@@ -158,7 +158,7 @@ fun ContinueReadingCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "جاری رکھیں",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold
                 )

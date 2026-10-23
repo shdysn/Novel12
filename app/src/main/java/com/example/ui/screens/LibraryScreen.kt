@@ -66,6 +66,7 @@ import com.example.ui.components.NovelCoverCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,7 +108,7 @@ fun LibraryScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "میری لائبریری (My Library)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = Color.White
@@ -115,7 +116,7 @@ fun LibraryScreen(
             }
             Text(
                 text = "آپ کے محفوظ کردہ ناولز، بک مارکس اور مطالعہ کی سرگزشت",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontSize = 12.sp,
                 color = Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.padding(top = 2.dp)
@@ -143,7 +144,7 @@ fun LibraryScreen(
                     text = {
                         Text(
                             text = title,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 13.sp
                         )
@@ -244,7 +245,7 @@ fun LibraryScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "یہ تمام ناولز آپ کے فون میں محفوظ ہیں اور انٹرنیٹ کے بغیر بھی پڑھے جا سکتے ہیں۔",
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -278,14 +279,14 @@ fun LibraryScreen(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = novel.title,
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 16.sp,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
                                             text = "مصنف: ${novel.author}  •  ${novel.totalChapters} ابواب  •  آف لائن محفوظ",
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             color = EmeraldPrimary
                                         )
@@ -310,7 +311,7 @@ fun LibraryScreen(
                                         ) {
                                             Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text("مطالعہ", fontFamily = FontFamily.Serif, fontSize = 12.sp)
+                                            Text("مطالعہ", fontFamily = UrduFontFamily, fontSize = 12.sp)
                                         }
                                     }
                                 }
@@ -330,7 +331,7 @@ fun LibraryScreen(
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = "مطالعہ کے اعداد و شمار (Reading Stats)",
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
                                 )
@@ -357,7 +358,7 @@ fun LibraryScreen(
                         ) {
                             Text(
                                 text = "تاریخچہ مطالعہ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
@@ -389,14 +390,14 @@ private fun ReadingStatItem(value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = value,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             color = EmeraldPrimary
         )
         Text(
             text = label,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontSize = 11.sp,
             color = MaterialTheme.colorScheme.outline
         )
@@ -434,7 +435,7 @@ private fun BookmarkCard(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = bookmark.novelTitle,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp,
                         color = MaterialTheme.colorScheme.onSurface
@@ -456,7 +457,7 @@ private fun BookmarkCard(
 
             Text(
                 text = "مصنف: ${bookmark.author}  •  ${bookmark.chapterTitle}",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(vertical = 4.dp)
@@ -481,7 +482,7 @@ private fun BookmarkCard(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = "${(bookmark.scrollProgressPercent * 100).toInt()}% پڑھا گیا",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -510,7 +511,7 @@ private fun BookmarkCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "وہیں سے جاری رکھیں",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
                         color = Color.White
@@ -541,14 +542,14 @@ private fun EmptyLibraryState(
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = title,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = message,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontSize = 13.sp,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

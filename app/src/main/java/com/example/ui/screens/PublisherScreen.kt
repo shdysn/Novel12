@@ -142,7 +142,7 @@ fun PublisherScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "ناول پبلشر و ایڈمن اسٹوڈیو (Admin Panel)",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 19.sp,
                                 color = Color.White
@@ -150,7 +150,7 @@ fun PublisherScreen(
                         }
                         Text(
                             text = "Supabase کلاؤڈ سنک، ڈرافٹ / اشاعت، اور آف لائن کیشے مینجمنٹ",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 12.sp,
                             color = Color.White.copy(alpha = 0.85f),
                             modifier = Modifier.padding(top = 2.dp)
@@ -200,7 +200,7 @@ fun PublisherScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = if (supabaseConfig.isConnected) "Supabase کلاؤڈ کنکشن فعال ہے" else "Supabase غیر منسلک ہے (آف لائن لوکل موڈ فعال)",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -227,7 +227,7 @@ fun PublisherScreen(
 
                     Text(
                         text = "حیثیت: ${supabaseConfig.lastSyncMessage}",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
                         color = if (supabaseConfig.isConnected) EmeraldPrimary else MaterialTheme.colorScheme.outline
                     )
@@ -246,7 +246,7 @@ fun PublisherScreen(
                         ) {
                             Icon(imageVector = Icons.Default.Link, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("کنکشن ٹیسٹ", fontFamily = FontFamily.Serif, fontSize = 12.sp)
+                            Text("کنکشن ٹیسٹ", fontFamily = UrduFontFamily, fontSize = 12.sp)
                         }
 
                         OutlinedButton(
@@ -256,7 +256,7 @@ fun PublisherScreen(
                         ) {
                             Icon(imageVector = Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("کلاؤڈ سے سنک", fontFamily = FontFamily.Serif, fontSize = 12.sp)
+                            Text("کلاؤڈ سے سنک", fontFamily = UrduFontFamily, fontSize = 12.sp)
                         }
                     }
                 }
@@ -272,7 +272,7 @@ fun PublisherScreen(
             ) {
                 Text(
                     text = "ایڈمن و تصنیف کنٹرولز",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -293,7 +293,7 @@ fun PublisherScreen(
                     ) {
                         Icon(imageVector = Icons.Default.PostAdd, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("نیا ناول شامل کریں", fontFamily = FontFamily.Serif, fontSize = 13.sp)
+                        Text("نیا ناول شامل کریں", fontFamily = UrduFontFamily, fontSize = 13.sp)
                     }
 
                     Button(

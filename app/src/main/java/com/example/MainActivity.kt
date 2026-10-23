@@ -75,7 +75,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            UrduNovelReaderTheme {
+            val readerSettings by viewModel.readerSettings.collectAsState()
+            UrduNovelReaderTheme(fontStyle = readerSettings.fontStyle) {
                 // Apply Right-To-Left (RTL) Layout Direction globally for Urdu UI
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     MainAppScaffold(viewModel = viewModel)

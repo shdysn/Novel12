@@ -49,6 +49,7 @@ import com.example.ui.components.NovelCoverCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @Composable
@@ -116,14 +117,14 @@ fun CategoriesScreen(
                     Column {
                         Text(
                             text = if (selectedCategory == NovelCategory.ALL) "اصنافِ کتب (Categories)" else selectedCategory.urduName,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             color = Color.White
                         )
                         Text(
                             text = if (selectedCategory == NovelCategory.ALL) "ہر ذوق اور پسند کے لیے اردو ادب کا خزانہ" else "${filteredNovels.size} ناولز دستیاب ہیں",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 12.sp,
                             color = Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.padding(top = 2.dp)
@@ -139,7 +140,7 @@ fun CategoriesScreen(
                     ) {
                         Text(
                             text = "تمام دیکھیں",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 11.sp,
                             color = GoldAccent,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -196,7 +197,7 @@ fun CategoriesScreen(
                         ) {
                             Text(
                                 text = "اس صنف میں فی الحال کوئی ناول دستیاب نہیں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 15.sp,
                                 color = MaterialTheme.colorScheme.outline
                             )

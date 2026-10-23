@@ -75,6 +75,7 @@ import com.example.ui.components.NovelVerticalCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @Composable
@@ -93,7 +94,7 @@ fun NovelDetailScreen(
 
     if (novel == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("ناول نہیں ملا", fontFamily = FontFamily.Serif)
+            Text("ناول نہیں ملا", fontFamily = UrduFontFamily)
         }
         return
     }
@@ -208,7 +209,7 @@ fun NovelDetailScreen(
                             Text(
                                 text = novel.title,
                                 color = Color.White,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 17.sp,
                                 textAlign = TextAlign.Center,
@@ -218,7 +219,7 @@ fun NovelDetailScreen(
                             Text(
                                 text = novel.author,
                                 color = Color.White.copy(alpha = 0.9f),
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 textAlign = TextAlign.Center
                             )
@@ -230,7 +231,7 @@ fun NovelDetailScreen(
                     // Title & Author
                     Text(
                         text = novel.title,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onBackground,
@@ -239,7 +240,7 @@ fun NovelDetailScreen(
 
                     Text(
                         text = "مصنف: ${novel.author}",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(top = 4.dp)
@@ -258,7 +259,7 @@ fun NovelDetailScreen(
                         ) {
                             Text(
                                 text = novel.category,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
@@ -282,7 +283,7 @@ fun NovelDetailScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = novel.language,
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -295,7 +296,7 @@ fun NovelDetailScreen(
                         ) {
                             Text(
                                 text = if (novel.readingProgress > 0f) "زیرِ مطالعہ" else "غیر مطالعہ شدہ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = if (novel.readingProgress > 0f) EmeraldPrimary else MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -309,7 +310,7 @@ fun NovelDetailScreen(
                         ) {
                             Text(
                                 text = if (novel.isDraft) "ڈرافٹ (غیر شائع)" else "شائع شدہ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = if (novel.isDraft) Color(0xFFE65100) else EmeraldPrimary,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -327,7 +328,7 @@ fun NovelDetailScreen(
                             ) {
                                 Text(
                                     text = "مطالعہ کی پیشرفت",
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -372,7 +373,7 @@ fun NovelDetailScreen(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = if (novel.readingProgress > 0f) "پڑھنا جاری رکھیں" else "ناول پڑھیں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             )
@@ -395,7 +396,7 @@ fun NovelDetailScreen(
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "بک مارک کریں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 color = EmeraldPrimary
                             )
@@ -440,7 +441,7 @@ fun NovelDetailScreen(
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = "آف لائن محفوظ ہو رہا ہے...",
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             color = MaterialTheme.colorScheme.onSecondaryContainer
                                         )
@@ -448,7 +449,7 @@ fun NovelDetailScreen(
                                     androidx.compose.material3.TextButton(
                                         onClick = { viewModel.cancelDownload(novel.id) }
                                     ) {
-                                        Text("منسوخ", fontFamily = FontFamily.Serif, fontSize = 11.sp, color = MaterialTheme.colorScheme.error)
+                                        Text("منسوخ", fontFamily = UrduFontFamily, fontSize = 11.sp, color = MaterialTheme.colorScheme.error)
                                     }
                                 }
                                 com.example.data.local.DownloadStatus.AVAILABLE_OFFLINE -> {
@@ -462,7 +463,7 @@ fun NovelDetailScreen(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = "آف لائن دستیاب (انٹرنیٹ کے بغیر پڑھیں)",
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
@@ -490,7 +491,7 @@ fun NovelDetailScreen(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = "نیا ورژن کلاؤڈ پر دستیاب ہے",
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -501,14 +502,14 @@ fun NovelDetailScreen(
                                         shape = RoundedCornerShape(8.dp),
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                                     ) {
-                                        Text("اپ ڈیٹ", fontFamily = FontFamily.Serif, fontSize = 11.sp, color = Color.Black)
+                                        Text("اپ ڈیٹ", fontFamily = UrduFontFamily, fontSize = 11.sp, color = Color.Black)
                                     }
                                 }
                                 com.example.data.local.DownloadStatus.FAILED -> {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             text = "ڈاؤن لوڈ ناکام رہا",
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             color = MaterialTheme.colorScheme.error
                                         )
@@ -518,7 +519,7 @@ fun NovelDetailScreen(
                                         shape = RoundedCornerShape(8.dp),
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                                     ) {
-                                        Text("دوبارہ کوشش", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                                        Text("دوبارہ کوشش", fontFamily = UrduFontFamily, fontSize = 11.sp)
                                     }
                                 }
                                 com.example.data.local.DownloadStatus.NOT_DOWNLOADED -> {
@@ -537,7 +538,7 @@ fun NovelDetailScreen(
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
                                                 text = "آف لائن پڑھنے کے لیے محفوظ کریں",
-                                                fontFamily = FontFamily.Serif,
+                                                fontFamily = UrduFontFamily,
                                                 fontSize = 12.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -547,7 +548,7 @@ fun NovelDetailScreen(
                                             shape = RoundedCornerShape(8.dp),
                                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
                                         ) {
-                                            Text("ڈاؤن لوڈ", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                                            Text("ڈاؤن لوڈ", fontFamily = UrduFontFamily, fontSize = 11.sp)
                                         }
                                     }
                                 }
@@ -567,7 +568,7 @@ fun NovelDetailScreen(
             ) {
                 Text(
                     text = "خلاصۂ ناول (Synopsis)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface
@@ -579,7 +580,7 @@ fun NovelDetailScreen(
                 ) {
                     Text(
                         text = novel.synopsis,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 14.sp,
                         lineHeight = 24.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -598,7 +599,7 @@ fun NovelDetailScreen(
             ) {
                 Text(
                     text = "مصنف کے بارے میں",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface
@@ -634,13 +635,13 @@ fun NovelDetailScreen(
                         Column {
                             Text(
                                 text = novel.author,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
                             Text(
                                 text = "اردو ادب کے معتبر ادیب اور کہانی نویس۔ متعدد شاہکار کتب کے مصنف۔",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.outline,
                                 lineHeight = 18.sp
@@ -662,14 +663,14 @@ fun NovelDetailScreen(
             ) {
                 Text(
                     text = "فہرستِ ابواب (${chapters.size})",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "مکمل یونیکوڈ اردو متن",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = EmeraldPrimary
                 )
@@ -716,13 +717,13 @@ fun NovelDetailScreen(
                         Column {
                             Text(
                                 text = chapter.title,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = "${chapter.readTimeMinutes} منٹ مطالعہ  •  ${chapter.wordCount} الفاظ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -745,7 +746,7 @@ fun NovelDetailScreen(
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = "اس سے ملتے جلتے ناولز (Related Novels)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface,

@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +43,7 @@ import com.example.data.model.Novel
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 
 // Cover gradients for different novels
 val CoverGradients = listOf(
@@ -112,7 +112,7 @@ fun NovelCoverCard(
                         Text(
                             text = novel.title,
                             color = Color.White,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
                             textAlign = TextAlign.Center,
@@ -124,7 +124,7 @@ fun NovelCoverCard(
                         Text(
                             text = novel.author,
                             color = Color.White.copy(alpha = 0.85f),
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 9.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 1,
@@ -153,7 +153,7 @@ fun NovelCoverCard(
                     ) {
                         Text(
                             text = novel.category,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
@@ -176,7 +176,7 @@ fun NovelCoverCard(
 
                 Text(
                     text = novel.title,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -186,7 +186,7 @@ fun NovelCoverCard(
 
                 Text(
                     text = "از " + novel.author,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(vertical = 2.dp)
@@ -194,7 +194,7 @@ fun NovelCoverCard(
 
                 Text(
                     text = novel.synopsis,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
@@ -234,7 +234,7 @@ fun NovelCoverCard(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "${novel.totalChapters} ابواب",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -247,7 +247,7 @@ fun NovelCoverCard(
                         ) {
                             Text(
                                 text = "شائع شدہ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 10.sp,
                                 color = EmeraldPrimary,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)

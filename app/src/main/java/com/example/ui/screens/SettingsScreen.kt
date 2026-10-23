@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @Composable
@@ -77,7 +78,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "ترتیبات و معلومات",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
                         color = Color.White
@@ -85,7 +86,7 @@ fun SettingsScreen(
                 }
                 Text(
                     text = "اردو فونٹس، قراءت اور کلاؤڈ سنک کی ترتیبات",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.8f),
                     modifier = Modifier.padding(top = 2.dp)
@@ -113,7 +114,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "یونیکوڈ متن اور جمیل نوری نستعلیق",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -124,7 +125,7 @@ fun SettingsScreen(
 
                     Text(
                         text = "یہ ایپلیکیشن تصاویر (سکینڈ پیجز) کے بجائے 100 فیصد خالص یونیکوڈ اردو متن استعمال کرتی ہے۔ اس کے فوائد:",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 20.sp
@@ -167,7 +168,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Supabase کلاؤڈ کی حیثیت",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
@@ -179,7 +180,7 @@ fun SettingsScreen(
                         ) {
                             Text(
                                 text = if (supabaseConfig.isConnected) "منسلک (Connected)" else "غیر منسلک",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 color = if (supabaseConfig.isConnected) EmeraldPrimary else MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -213,7 +214,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "ایپ کے بارے میں (About)",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
@@ -223,7 +224,7 @@ fun SettingsScreen(
 
                     Text(
                         text = "اردو ناولز ریڈر اینڈ پبلشر - ورژن 1.0\nمستند اردو لٹریچر، پیرِ کامل، راجہ گدھ، امراؤ جان ادا اور جدید ناولز کا ڈیجیٹل کتب خانہ۔",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         lineHeight = 22.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -248,7 +249,7 @@ private fun UnicodeAdvantageItem(text: String) {
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface,
             lineHeight = 18.sp

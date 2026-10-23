@@ -52,6 +52,7 @@ import com.example.ui.components.NovelCoverCard
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -80,7 +81,7 @@ fun SearchScreen(
         ) {
             Text(
                 text = "کتب و مصنفین کی تلاش",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = Color.White
@@ -97,7 +98,7 @@ fun SearchScreen(
                 placeholder = {
                     Text(
                         text = "ناول کا نام، مصنف یا صنف تلاش کریں...",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -152,7 +153,7 @@ fun SearchScreen(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "حالیہ تلاش (Recent Searches)",
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 15.sp,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -198,7 +199,7 @@ fun SearchScreen(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = term,
-                                            fontFamily = FontFamily.Serif,
+                                            fontFamily = UrduFontFamily,
                                             fontSize = 12.sp,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
@@ -226,7 +227,7 @@ fun SearchScreen(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "مقبول ترین تلاش (Trending Searches)",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -254,7 +255,7 @@ fun SearchScreen(
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = term,
-                                        fontFamily = FontFamily.Serif,
+                                        fontFamily = UrduFontFamily,
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         fontWeight = FontWeight.SemiBold
@@ -275,7 +276,7 @@ fun SearchScreen(
                 item {
                     Text(
                         text = "نتائج برائے: \"$searchQuery\" (${filteredNovels.size})",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -300,14 +301,14 @@ fun SearchScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = "کوئی نتیجہ نہیں ملا",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = "براہ کرم اسپیلنگ چیک کریں یا کسی دوسرے مصنف یا عنوان سے تلاش کریں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.outline,
                                 textAlign = TextAlign.Center,

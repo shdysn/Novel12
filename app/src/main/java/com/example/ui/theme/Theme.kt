@@ -8,8 +8,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.data.model.FontStyleType
 
 private val DarkColorScheme = darkColorScheme(
     primary = EmeraldDarkPrimary,
@@ -51,8 +53,10 @@ private val LightColorScheme = lightColorScheme(
 fun UrduNovelReaderTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // Keep bespoke Urdu green-gold palette by default
+    fontStyle: FontStyleType = FontStyleType.NASTALEEQ,
     content: @Composable () -> Unit
 ) {
+    val activeFontFamily = getFontFamily(fontStyle)
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -62,9 +66,13 @@ fun UrduNovelReaderTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalUrduFontFamily provides activeFontFamily
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = createUrduTypography(activeFontFamily),
+            content = content
+        )
+    }
 }

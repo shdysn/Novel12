@@ -102,6 +102,7 @@ import com.example.ui.components.ReaderSettingsSheet
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 import com.example.util.TextPaginator
 import kotlinx.coroutines.launch
@@ -152,7 +153,7 @@ fun ReaderScreen(
 
     if (novel == null || chapter == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("باب دستیاب نہیں ہے", fontFamily = FontFamily.Serif)
+            Text("باب دستیاب نہیں ہے", fontFamily = UrduFontFamily)
         }
         return
     }

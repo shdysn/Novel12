@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,6 +29,7 @@ import com.example.data.model.Author
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 
 val AuthorGradients = listOf(
     listOf(Color(0xFF0F3B2E), Color(0xFF1B5E48)),
@@ -67,7 +67,7 @@ fun AuthorCard(
             val initials = author.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString("")
             Text(
                 text = initials.ifBlank { "ع" },
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 color = Color.White
@@ -78,7 +78,7 @@ fun AuthorCard(
 
         Text(
             text = author.name,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface,
@@ -89,7 +89,7 @@ fun AuthorCard(
 
         Text(
             text = "${author.totalNovelsCount} ناولز",
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontSize = 10.sp,
             color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center

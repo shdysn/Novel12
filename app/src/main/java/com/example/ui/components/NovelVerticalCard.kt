@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.Novel
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 
 @Composable
 fun NovelVerticalCard(
@@ -112,7 +112,7 @@ fun NovelVerticalCard(
                         Text(
                             text = novel.title,
                             color = Color.White,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center,
@@ -125,7 +125,7 @@ fun NovelVerticalCard(
                             Text(
                                 text = novel.author,
                                 color = Color.White.copy(alpha = 0.9f),
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 10.sp,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
@@ -148,7 +148,7 @@ fun NovelVerticalCard(
         // Title under cover
         Text(
             text = novel.title,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurface,
@@ -159,7 +159,7 @@ fun NovelVerticalCard(
         // Author
         Text(
             text = novel.author,
-            fontFamily = FontFamily.Serif,
+            fontFamily = UrduFontFamily,
             fontSize = 11.sp,
             color = MaterialTheme.colorScheme.primary,
             maxLines = 1,
