@@ -191,7 +191,8 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = if (supabaseConfig.url.isNotBlank()) "پراجیکٹ: ${supabaseConfig.url}" else "Supabase URL پبلشر ٹیب میں کنفیگر کریں۔",
+                        text = if (supabaseConfig.isConnected) "آن لائن کلاؤڈ سنک فعال ہے (تمام نئ کتب خود بخود اپ ڈیٹ ہونگی)" else "لوکل سیکیور لائبریری موڈ فعال ہے",
+                        fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

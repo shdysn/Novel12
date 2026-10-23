@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.components.AdminPasscodeDialog
 import com.example.ui.screens.CategoriesScreen
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.LibraryScreen
@@ -95,6 +96,8 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showPublisherSheet by remember { mutableStateOf(false) }
+    var showAdminPasscodeDialog by remember { mutableStateOf(false) }
+    var isAdminUnlocked by remember { mutableStateOf(false) }
 
     LaunchedEffect(userMessage) {
         userMessage?.let { msg ->
@@ -264,7 +267,13 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             3 -> LibraryScreen(viewModel = viewModel)
                             4 -> ProfileScreen(
                                 viewModel = viewModel,
-                                onOpenPublisher = { showPublisherSheet = true }
+                                onOpenPublisher = {
+                                    if (isAdminUnlocked) {
+                                        showPublisherSheet = true
+                                    } else {
+                                        showAdminPasscodeDialog = true
+                                    }
+                                }
                             )
                         }
                     }
@@ -286,6 +295,18 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                 }
             }
         }
+    }
+
+    // Admin Passcode Security Gate
+    if (showAdminPasscodeDialog) {
+        AdminPasscodeDialog(
+            onDismiss = { showAdminPasscodeDialog = false },
+            onSuccess = {
+                isAdminUnlocked = true
+                showAdminPasscodeDialog = false
+                showPublisherSheet = true
+            }
+        )
     }
 
     // Publisher & Cloud Modal Sheet
