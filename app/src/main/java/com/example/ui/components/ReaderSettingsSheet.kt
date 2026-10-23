@@ -325,46 +325,26 @@ fun ReaderSettingsSheet(
                 colors = SliderDefaults.colors(thumbColor = EmeraldPrimary, activeTrackColor = EmeraldPrimary)
             )
 
-            // 3. Font Family (Nastaliq, Mehr, Naskh)
+            // 3. Font Family (PDMS Jauhar Default)
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "رسم الخط (Font Family)",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 6.dp)
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = EmeraldPrimary.copy(alpha = 0.12f)
                 ) {
-                    FilterChip(
-                        selected = settings.fontStyle == FontStyleType.NASTALEEQ,
-                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.NASTALEEQ)) },
-                        label = { Text("نوری نستعلیق", fontSize = 11.sp, fontFamily = UrduFontFamily) }
-                    )
-                    FilterChip(
-                        selected = settings.fontStyle == FontStyleType.MEHR_NASTALEEQ,
-                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.MEHR_NASTALEEQ)) },
-                        label = { Text("مہر نستعلیق", fontSize = 11.sp, fontFamily = UrduFontFamily) }
-                    )
-                    FilterChip(
-                        selected = settings.fontStyle == FontStyleType.LATEEF,
-                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.LATEEF)) },
-                        label = { Text("خطِ لطیف", fontSize = 11.sp, fontFamily = UrduFontFamily) }
-                    )
-                    FilterChip(
-                        selected = settings.fontStyle == FontStyleType.SCHEHERAZADE,
-                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.SCHEHERAZADE)) },
-                        label = { Text("خطِ شہزاد", fontSize = 11.sp, fontFamily = UrduFontFamily) }
-                    )
-                    FilterChip(
-                        selected = settings.fontStyle == FontStyleType.NASKH,
-                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.NASKH)) },
-                        label = { Text("امیری نسخ", fontSize = 11.sp, fontFamily = UrduFontFamily) }
+                    Text(
+                        text = "PDMS Jauhar (نستعلیق معیاری — طے شدہ)",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = EmeraldPrimary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }
             }
@@ -402,30 +382,32 @@ fun ReaderSettingsSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 5. Line Spacing Multiplier (1.4x - 2.4x)
+            // 5. Line Spacing Multiplier (Fixed 1.6x)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "سطروں کا فاصلہ (Line Height): ${"%.1f".format(settings.lineHeightMultiplier)}x",
+                    text = "سطروں کا فاصلہ (Line Spacing): 1.6x (مقررہ)",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = EmeraldPrimary.copy(alpha = 0.12f)
+                ) {
+                    Text(
+                        text = "1.6x",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = EmeraldPrimary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
-
-            Slider(
-                value = settings.lineHeightMultiplier,
-                onValueChange = { onSettingsChanged(settings.copy(lineHeightMultiplier = it)) },
-                valueRange = 1.4f..2.4f,
-                steps = 9,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("line_height_slider"),
-                colors = SliderDefaults.colors(thumbColor = EmeraldPrimary, activeTrackColor = EmeraldPrimary)
-            )
 
             // 6. Paragraph Spacing (4dp - 24dp)
             Row(
