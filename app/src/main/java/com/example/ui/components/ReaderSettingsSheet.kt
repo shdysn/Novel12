@@ -52,8 +52,13 @@ import com.example.data.model.FontStyleType
 import com.example.data.model.ReaderSettings
 import com.example.data.model.ReaderTheme
 import com.example.data.model.TextAlignmentType
+import com.example.data.model.toUrduDigits
+import com.example.ui.theme.AmiriFontFamily
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.MehrNastaliqFontFamily
+import com.example.ui.theme.NotoNastaliqUrduFontFamily
+import com.example.ui.theme.UrduFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +68,11 @@ fun ReaderSettingsSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val fontFam = when (settings.fontStyle) {
+        FontStyleType.NASTALEEQ -> NotoNastaliqUrduFontFamily
+        FontStyleType.MEHR_NASTALEEQ -> MehrNastaliqFontFamily
+        FontStyleType.NASKH -> AmiriFontFamily
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -78,41 +88,122 @@ fun ReaderSettingsSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "قراءت اور صفحہ بندی کی ترتیبات (Reading Settings)",
-                fontFamily = FontFamily.Serif,
+                text = "کتابی صفحہ بندی اور قراءت کی ترتیبات",
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
-            // Live preview card with selected styling
-            Surface(
+            // Realistic Live Book Page Preview Card Resting on Desk Surface
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = settings.theme.backgroundColor,
-                border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent.copy(alpha = 0.5f)),
-                shadowElevation = 2.dp
+                    .padding(vertical = 4.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(settings.theme.deskColor)
+                    .padding(6.dp)
             ) {
-                Text(
-                    text = "یہ اردو صفحہ بندی کا براہِ راست نمونہ ہے، جمیل نوری نستعلیق خطاطی کے ساتھ۔",
-                    fontFamily = if (settings.fontStyle == FontStyleType.NASTALEEQ) FontFamily.Serif else FontFamily.Default,
-                    fontSize = settings.fontSizeSp.sp,
-                    lineHeight = (settings.fontSizeSp * settings.lineHeightMultiplier).sp,
-                    color = settings.theme.textColor,
-                    textAlign = if (settings.alignment == TextAlignmentType.JUSTIFIED) TextAlign.Justify else TextAlign.Right,
-                    modifier = Modifier.padding(14.dp)
-                )
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp, topEnd = 3.dp, bottomEnd = 3.dp),
+                    color = settings.theme.backgroundColor,
+                    border = if (settings.showBookFrame) androidx.compose.foundation.BorderStroke(0.8.dp, settings.theme.textColor.copy(alpha = 0.22f)) else null,
+                    shadowElevation = 4.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                    // Preview Running Book Header
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "« پیرِ کامل »",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = settings.theme.textColor.copy(alpha = 0.65f),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(text = "❦", fontSize = 11.sp, color = GoldAccent)
+                        Text(
+                            text = "باب اول: آغاز",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = settings.theme.textColor.copy(alpha = 0.65f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(0.75.dp)
+                            .background(settings.theme.textColor.copy(alpha = 0.18f))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Preview Book Text
+                    Text(
+                        text = "یہ اردو کتاب کے اصل ورق کا نمونہ ہے، جس پر اوپر کتاب کا عنوان اور نیچے صفحہ نمبر چھپا ہوتا ہے۔",
+                        fontFamily = fontFam,
+                        fontSize = (settings.fontSizeSp * 0.9f).sp,
+                        lineHeight = ((settings.fontSizeSp * 0.9f) * settings.lineHeightMultiplier).sp,
+                        color = settings.theme.textColor,
+                        textAlign = if (settings.alignment == TextAlignmentType.JUSTIFIED) TextAlign.Justify else TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(0.75.dp)
+                            .background(settings.theme.textColor.copy(alpha = 0.18f))
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    // Preview Running Book Folio / Page Number
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (settings.useUrduNumerals) "باب ۱ از ۱۰" else "باب 1 / 10",
+                            fontFamily = fontFam,
+                            fontSize = 9.sp,
+                            color = settings.theme.textColor.copy(alpha = 0.45f)
+                        )
+                        Text(
+                            text = if (settings.useUrduNumerals) "— ۱۲ —" else "— 12 —",
+                            fontFamily = fontFam,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            color = settings.theme.textColor.copy(alpha = 0.85f)
+                        )
+                        Text(
+                            text = if (settings.useUrduNumerals) "۱۲ / ۸۰" else "12 / 80",
+                            fontFamily = fontFam,
+                            fontSize = 9.sp,
+                            color = settings.theme.textColor.copy(alpha = 0.45f)
+                        )
+                    }
+                }
             }
+        }
 
             Spacer(modifier = Modifier.height(14.dp))
 
             // 1. Reading Themes (4 Core Themes)
             Text(
                 text = "مطالعہ کے پس منظر (Reading Themes)",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -156,7 +247,7 @@ fun ReaderSettingsSheet(
                             Text(
                                 text = "ا",
                                 color = theme.textColor,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
@@ -180,7 +271,7 @@ fun ReaderSettingsSheet(
                         }
                         Text(
                             text = theme.titleUrdu.substringBefore(" ("),
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(top = 4.dp)
@@ -199,7 +290,7 @@ fun ReaderSettingsSheet(
             ) {
                 Text(
                     text = "فونٹ سائز: ${(settings.fontSizeSp).toInt()} pt",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -241,7 +332,7 @@ fun ReaderSettingsSheet(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "رسم الخط (Font Family)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 6.dp)
@@ -279,7 +370,7 @@ fun ReaderSettingsSheet(
             ) {
                 Text(
                     text = "متن کی سیدھ (Alignment)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -289,13 +380,13 @@ fun ReaderSettingsSheet(
                         selected = settings.alignment == TextAlignmentType.JUSTIFIED,
                         onClick = { onSettingsChanged(settings.copy(alignment = TextAlignmentType.JUSTIFIED)) },
                         leadingIcon = { Icon(Icons.Default.FormatAlignJustify, contentDescription = null, modifier = Modifier.size(14.dp)) },
-                        label = { Text("برابر (Justified)", fontFamily = FontFamily.Serif, fontSize = 12.sp) }
+                        label = { Text("برابر (Justified)", fontFamily = UrduFontFamily, fontSize = 12.sp) }
                     )
                     FilterChip(
                         selected = settings.alignment == TextAlignmentType.RIGHT_ALIGNED,
                         onClick = { onSettingsChanged(settings.copy(alignment = TextAlignmentType.RIGHT_ALIGNED)) },
                         leadingIcon = { Icon(Icons.AutoMirrored.Filled.FormatAlignRight, contentDescription = null, modifier = Modifier.size(14.dp)) },
-                        label = { Text("دائیں جانب", fontFamily = FontFamily.Serif, fontSize = 12.sp) }
+                        label = { Text("دائیں جانب", fontFamily = UrduFontFamily, fontSize = 12.sp) }
                     )
                 }
             }
@@ -310,7 +401,7 @@ fun ReaderSettingsSheet(
             ) {
                 Text(
                     text = "سطروں کا فاصلہ (Line Height): ${"%.1f".format(settings.lineHeightMultiplier)}x",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -335,7 +426,7 @@ fun ReaderSettingsSheet(
             ) {
                 Text(
                     text = "پیراگراف کے درمیان فاصلہ: ${settings.paragraphSpacingDp} dp",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -358,7 +449,7 @@ fun ReaderSettingsSheet(
             ) {
                 Text(
                     text = "صفحے کے حاشیے (Margins): ${settings.horizontalMarginDp} dp",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -373,7 +464,63 @@ fun ReaderSettingsSheet(
                 colors = SliderDefaults.colors(thumbColor = EmeraldPrimary, activeTrackColor = EmeraldPrimary)
             )
 
-            // 8. Screen Brightness Control
+            // 8. Book Page Border Frame (کتابی حاشیہ)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "کتابی حاشیہ (Book Frame)",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = settings.showBookFrame,
+                        onClick = { onSettingsChanged(settings.copy(showBookFrame = true)) },
+                        label = { Text("کتابی حاشیہ", fontFamily = UrduFontFamily, fontSize = 11.sp) }
+                    )
+                    FilterChip(
+                        selected = !settings.showBookFrame,
+                        onClick = { onSettingsChanged(settings.copy(showBookFrame = false)) },
+                        label = { Text("سادہ ورق", fontFamily = UrduFontFamily, fontSize = 11.sp) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 9. Page Numbering Digits (صفحہ نمبر کے ہندسے)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "صفحہ نمبر کے ہندسے",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = settings.useUrduNumerals,
+                        onClick = { onSettingsChanged(settings.copy(useUrduNumerals = true)) },
+                        label = { Text("اردو (— ۱۲ —)", fontFamily = UrduFontFamily, fontSize = 11.sp) }
+                    )
+                    FilterChip(
+                        selected = !settings.useUrduNumerals,
+                        onClick = { onSettingsChanged(settings.copy(useUrduNumerals = false)) },
+                        label = { Text("انگریزی (— 12 —)", fontFamily = UrduFontFamily, fontSize = 11.sp) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // 10. Screen Brightness Control
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -384,7 +531,7 @@ fun ReaderSettingsSheet(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "اسکرین کی چمک (Brightness): ${(settings.brightness * 100).toInt()}%",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp
                     )

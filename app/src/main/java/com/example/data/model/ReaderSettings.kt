@@ -15,14 +15,15 @@ import com.example.ui.theme.ReaderSepiaText
 enum class ReaderTheme(
     val titleUrdu: String,
     val backgroundColor: Color,
-    val textColor: Color
+    val textColor: Color,
+    val deskColor: Color
 ) {
-    WARM_PAPER("کاغذی (Warm Paper)", ReaderPaperBg, ReaderPaperText),
-    SEPIA("سیپیا (Sepia)", ReaderSepiaBg, ReaderSepiaText),
-    DARK_MODE("نائٹ موڈ (Dark Mode)", ReaderNightBg, ReaderNightText),
-    PURE_WHITE("خالص سفید (Pure White)", Color(0xFFFFFFFF), Color(0xFF141414)),
-    OLED("گہرا سیاہ (OLED)", ReaderOledBg, ReaderOledText),
-    EMERALD("زمردی (Emerald)", ReaderEmeraldBg, ReaderEmeraldText)
+    WARM_PAPER("کاغذی (Warm Paper)", ReaderPaperBg, ReaderPaperText, Color(0xFFE8DFC9)),
+    SEPIA("سیپیا (Sepia)", ReaderSepiaBg, ReaderSepiaText, Color(0xFFD6C5A2)),
+    DARK_MODE("نائٹ موڈ (Dark Mode)", ReaderNightBg, ReaderNightText, Color(0xFF0F1215)),
+    PURE_WHITE("خالص سفید (Pure White)", Color(0xFFFFFFFF), Color(0xFF141414), Color(0xFFE2E6EC)),
+    OLED("گہرا سیاہ (OLED)", ReaderOledBg, ReaderOledText, Color(0xFF080808)),
+    EMERALD("زمردی (Emerald)", ReaderEmeraldBg, ReaderEmeraldText, Color(0xFF06140D))
 }
 
 enum class FontStyleType(val urduLabel: String) {
@@ -38,13 +39,25 @@ enum class TextAlignmentType(val urduLabel: String) {
 
 data class ReaderSettings(
     val fontSizeSp: Float = 22f,
-    val lineHeightMultiplier: Float = 1.8f,
-    val paragraphSpacingDp: Int = 12,
-    val horizontalMarginDp: Int = 20,
-    val verticalMarginDp: Int = 16,
+    val lineHeightMultiplier: Float = 1.65f,
+    val paragraphSpacingDp: Int = 4,
+    val horizontalMarginDp: Int = 12,
+    val verticalMarginDp: Int = 8,
     val alignment: TextAlignmentType = TextAlignmentType.JUSTIFIED,
     val theme: ReaderTheme = ReaderTheme.WARM_PAPER,
     val fontStyle: FontStyleType = FontStyleType.NASTALEEQ,
     val brightness: Float = 0.85f,
-    val autoBookmark: Boolean = true
+    val autoBookmark: Boolean = true,
+    val showBookFrame: Boolean = true,
+    val useUrduNumerals: Boolean = true
 )
+
+/**
+ * Converts Western digits (0-9) to Eastern/Urdu digits (۰-۹) for authentic book folios.
+ */
+fun Int.toUrduDigits(): String {
+    val urduDigits = charArrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
+    return this.toString().map { ch ->
+        if (ch in '0'..'9') urduDigits[ch - '0'] else ch
+    }.joinToString("")
+}

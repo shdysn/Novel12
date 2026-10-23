@@ -226,10 +226,10 @@ class NovelRepository(private val context: Context) {
 
     private fun loadSettings() {
         val fontSize = prefs.getFloat("font_size", 22f)
-        val lineSpacing = prefs.getFloat("line_spacing", 1.8f)
-        val paragraphSpacing = prefs.getInt("paragraph_spacing", 12)
-        val horizMargin = prefs.getInt("horiz_margin", 20)
-        val vertMargin = prefs.getInt("vert_margin", 16)
+        val lineSpacing = prefs.getFloat("line_spacing", 1.65f)
+        val paragraphSpacing = prefs.getInt("paragraph_spacing", 4)
+        val horizMargin = prefs.getInt("horiz_margin", 12)
+        val vertMargin = prefs.getInt("vert_margin", 8)
         val alignmentName = prefs.getString("text_alignment", TextAlignmentType.JUSTIFIED.name) ?: TextAlignmentType.JUSTIFIED.name
         val alignment = try { TextAlignmentType.valueOf(alignmentName) } catch (e: Exception) { TextAlignmentType.JUSTIFIED }
         val themeName = prefs.getString("reader_theme", ReaderTheme.WARM_PAPER.name) ?: ReaderTheme.WARM_PAPER.name
@@ -237,6 +237,8 @@ class NovelRepository(private val context: Context) {
         val fontStyleName = prefs.getString("font_style", FontStyleType.NASTALEEQ.name) ?: FontStyleType.NASTALEEQ.name
         val fontStyle = try { FontStyleType.valueOf(fontStyleName) } catch (e: Exception) { FontStyleType.NASTALEEQ }
         val brightness = prefs.getFloat("screen_brightness", 0.85f)
+        val showBookFrame = prefs.getBoolean("show_book_frame", true)
+        val useUrduNumerals = prefs.getBoolean("use_urdu_numerals", true)
 
         _readerSettings.value = ReaderSettings(
             fontSizeSp = fontSize,
@@ -247,7 +249,9 @@ class NovelRepository(private val context: Context) {
             alignment = alignment,
             theme = theme,
             fontStyle = fontStyle,
-            brightness = brightness
+            brightness = brightness,
+            showBookFrame = showBookFrame,
+            useUrduNumerals = useUrduNumerals
         )
     }
 
@@ -263,6 +267,8 @@ class NovelRepository(private val context: Context) {
             .putString("reader_theme", settings.theme.name)
             .putString("font_style", settings.fontStyle.name)
             .putFloat("screen_brightness", settings.brightness)
+            .putBoolean("show_book_frame", settings.showBookFrame)
+            .putBoolean("use_urdu_numerals", settings.useUrduNumerals)
             .apply()
     }
 

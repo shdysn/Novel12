@@ -6,7 +6,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,10 +76,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import com.example.data.model.toUrduDigits
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -139,8 +144,8 @@ fun ReaderScreen(
     var showSearchBar by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // Immersive Reading mode: toggle toolbar visibility on tap
-    var isControlsVisible by remember { mutableStateOf(true) }
+    // Immersive Reading mode: open directly into pure book leaf mode without intrusive toolbars
+    var isControlsVisible by remember { mutableStateOf(false) }
 
     // Track character offset to restore reading location on font / margin recalculations
     var currentTrackingOffset by remember { mutableIntStateOf(initialCharOffset) }
@@ -172,16 +177,25 @@ fun ReaderScreen(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(activeTheme.backgroundColor)
+            .background(activeTheme.deskColor)
             .testTag("reader_screen")
     ) {
         val screenWidthDp = maxWidth
         val screenHeightDp = maxHeight
 
-        // Dimensions available for pure page text (excluding margins and top/bottom reserve)
-        val textWidthDp = (screenWidthDp - (readerSettings.horizontalMarginDp * 2).dp).coerceAtLeast(100.dp)
-        // Reserve 64dp top and 56dp bottom so text never overlaps with controls when visible
-        val textHeightDp = (screenHeightDp - 120.dp).coerceAtLeast(150.dp)
+        // Physical book page sheet padding from surrounding desk surface
+        val sheetHorizPadding = 6.dp
+        val sheetVertPadding = 4.dp
+
+        // Dimensions available for pure page text inside the physical book sheet
+        val extraHorizPadDp = if (readerSettings.showBookFrame) 16.dp else 6.dp
+        val textWidthDp = (screenWidthDp - (sheetHorizPadding * 2) - (readerSettings.horizontalMarginDp * 2).dp - extraHorizPadDp).coerceAtLeast(100.dp)
+
+        // Exact vertical overhead calculation:
+        // System bars (~44dp) + Sheet padding (8dp) + Page column padding (extraVertPadDp + verticalMargin*2) + Header (24dp) + Footer (22dp) + Spacers (8dp)
+        val extraVertPadDp = if (readerSettings.showBookFrame) 12.dp else 4.dp
+        val bookOverheadDp = 44.dp + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 54.dp
+        val textHeightDp = (screenHeightDp - bookOverheadDp).coerceAtLeast(150.dp)
 
         val widthPx = with(density) { textWidthDp.roundToPx() }
         val heightPx = with(density) { textHeightDp.roundToPx() }
@@ -269,16 +283,13 @@ fun ReaderScreen(
             }
         }
 
-        // Reading Area with Horizontal Pager
+        // Reading Area with Horizontal Pager (Authentic Book Leaf resting on Desk)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    top = 60.dp,
-                    bottom = 54.dp,
-                    start = readerSettings.horizontalMarginDp.dp,
-                    end = readerSettings.horizontalMarginDp.dp
-                )
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -292,6 +303,9 @@ fun ReaderScreen(
                         page = page,
                         novelTitle = novel.title,
                         chapterTitle = chapter.title,
+                        chapterNumber = chapter.chapterNumber,
+                        totalChapters = allChapters.size,
+                        totalPages = pages.size,
                         readerSettings = readerSettings,
                         searchQuery = searchQuery,
                         activeTheme = activeTheme,
@@ -311,7 +325,8 @@ fun ReaderScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 60.dp, bottom = 54.dp)
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .pointerInput(pages.size) {
                     detectTapGestures(
                         onTap = { offset ->
@@ -791,11 +806,19 @@ fun ReaderScreen(
  * Renders an individual book page formatted with pure Unicode Urdu text,
  * balanced margins, Nastaliq typography, and decorative elements on start/end.
  */
+/**
+ * Renders an authentic physical book page formatted with pure Unicode Urdu text,
+ * running book title header at the top, genuine book frame, spine binding crease,
+ * and prominent page number folio at the bottom.
+ */
 @Composable
 private fun SinglePageView(
     page: BookPage,
     novelTitle: String,
     chapterTitle: String,
+    chapterNumber: Int,
+    totalChapters: Int,
+    totalPages: Int,
     readerSettings: com.example.data.model.ReaderSettings,
     searchQuery: String,
     activeTheme: com.example.data.model.ReaderTheme,
@@ -803,145 +826,440 @@ private fun SinglePageView(
     composeTextAlign: TextAlign,
     onNextChapter: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("page_content_${page.pageNumber}")
-    ) {
-        // Page Header: Subtle Running Novel & Chapter Title
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = novelTitle,
-                fontFamily = fontFam,
-                fontSize = 10.sp,
-                color = activeTheme.textColor.copy(alpha = 0.45f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
+    val pageNumberDisplay = if (readerSettings.useUrduNumerals) {
+        page.pageNumber.toUrduDigits()
+    } else {
+        page.pageNumber.toString()
+    }
+    val totalPagesDisplay = if (readerSettings.useUrduNumerals) {
+        totalPages.toUrduDigits()
+    } else {
+        totalPages.toString()
+    }
+    val chapterNumberDisplay = if (readerSettings.useUrduNumerals) {
+        chapterNumber.toUrduDigits()
+    } else {
+        chapterNumber.toString()
+    }
+    val totalChaptersDisplay = if (readerSettings.useUrduNumerals) {
+        totalChapters.toUrduDigits()
+    } else {
+        totalChapters.toString()
+    }
 
-            Text(
-                text = "صفحہ ${page.pageNumber}",
-                fontFamily = fontFam,
-                fontSize = 10.sp,
-                color = activeTheme.textColor.copy(alpha = 0.45f)
-            )
-        }
-
-        // First page decoration: Bismillah & Chapter Title
-        if (page.isFirstPageOfChapter) {
-            Text(
-                text = "﷽",
-                fontFamily = fontFam,
-                fontSize = (readerSettings.fontSizeSp + 4).sp,
-                color = activeTheme.textColor.copy(alpha = 0.85f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            )
-
-            Text(
-                text = "❦ $chapterTitle ❦",
-                fontFamily = fontFam,
-                fontWeight = FontWeight.Bold,
-                fontSize = (readerSettings.fontSizeSp + 2).sp,
-                color = EmeraldPrimary,
-                textAlign = TextAlign.Center,
-                lineHeight = ((readerSettings.fontSizeSp + 2) * 1.5f).sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 14.dp)
-            )
-        }
-
-        // Highlight search keyword if entered
-        val annotatedText = remember(page.text, searchQuery, activeTheme) {
-            buildAnnotatedString {
-                val text = page.text
-                if (searchQuery.isBlank()) {
-                    append(text)
-                } else {
-                    var startIndex = 0
-                    while (startIndex < text.length) {
-                        val index = text.indexOf(searchQuery, startIndex, ignoreCase = true)
-                        if (index == -1) {
-                            append(text.substring(startIndex))
-                            break
-                        }
-                        append(text.substring(startIndex, index))
-                        withStyle(
-                            style = SpanStyle(
-                                background = GoldAccent.copy(alpha = 0.45f),
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append(text.substring(index, index + searchQuery.length))
-                        }
-                        startIndex = index + searchQuery.length
+    // Highlight search keyword if entered
+    val annotatedText = remember(page.text, searchQuery, activeTheme) {
+        buildAnnotatedString {
+            val text = page.text
+            if (searchQuery.isBlank()) {
+                append(text)
+            } else {
+                var startIndex = 0
+                while (startIndex < text.length) {
+                    val index = text.indexOf(searchQuery, startIndex, ignoreCase = true)
+                    if (index == -1) {
+                        append(text.substring(startIndex))
+                        break
                     }
+                    append(text.substring(startIndex, index))
+                    withStyle(
+                        style = SpanStyle(
+                            background = GoldAccent.copy(alpha = 0.45f),
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append(text.substring(index, index + searchQuery.length))
+                    }
+                    startIndex = index + searchQuery.length
                 }
             }
         }
+    }
 
-        // Page Text Content
-        Text(
-            text = annotatedText,
-            fontFamily = fontFam,
-            fontSize = readerSettings.fontSizeSp.sp,
-            lineHeight = (readerSettings.fontSizeSp * readerSettings.lineHeightMultiplier).sp,
-            color = activeTheme.textColor,
-            textAlign = composeTextAlign,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        )
+    // Authentic Physical Book Page Sheet Container
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("page_content_${page.pageNumber}"),
+        shape = RoundedCornerShape(
+            topStart = 8.dp,
+            bottomStart = 8.dp,
+            topEnd = 3.dp,
+            bottomEnd = 3.dp
+        ),
+        color = activeTheme.backgroundColor,
+        shadowElevation = 5.dp
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 1. Stacked Pages Layer Illusion on Left Outer Edge (turning edge in RTL)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxHeight()
+                    .width(6.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                activeTheme.textColor.copy(alpha = 0.08f),
+                                activeTheme.textColor.copy(alpha = 0.02f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
 
-        // Last Page of Chapter: Elegant End Flourish & Next Chapter prompt
-        if (page.isLastPageOfChapter) {
+            // 2. Spine Binding Crease Shadow on Right Inner Edge (binding gutter in RTL)
+            // Curves realistically into the book spine
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .width(26.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                activeTheme.textColor.copy(alpha = 0.02f),
+                                activeTheme.textColor.copy(alpha = 0.06f),
+                                activeTheme.textColor.copy(alpha = 0.13f)
+                            )
+                        )
+                    )
+            )
+            // Hairline spine gutter fold crease
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .width(1.dp)
+                    .background(activeTheme.textColor.copy(alpha = 0.16f))
+            )
+
+            // 3. Classical Urdu Double Book Frame (کتابی حاشیہ / جدول)
+            if (readerSettings.showBookFrame) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
+                ) {
+                    // Outer border
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(
+                                width = 0.8.dp,
+                                color = activeTheme.textColor.copy(alpha = 0.22f),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    )
+                    // Inner hairline border
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(3.dp)
+                            .border(
+                                width = 0.5.dp,
+                                color = activeTheme.textColor.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(2.dp)
+                            )
+                    )
+                    // Classical corner flourishes
+                    Text(
+                        text = "❖",
+                        fontSize = 7.sp,
+                        color = GoldAccent.copy(alpha = 0.85f),
+                        modifier = Modifier.align(Alignment.TopStart).padding(4.5.dp)
+                    )
+                    Text(
+                        text = "❖",
+                        fontSize = 7.sp,
+                        color = GoldAccent.copy(alpha = 0.85f),
+                        modifier = Modifier.align(Alignment.TopEnd).padding(4.5.dp)
+                    )
+                    Text(
+                        text = "❖",
+                        fontSize = 7.sp,
+                        color = GoldAccent.copy(alpha = 0.85f),
+                        modifier = Modifier.align(Alignment.BottomStart).padding(4.5.dp)
+                    )
+                    Text(
+                        text = "❖",
+                        fontSize = 7.sp,
+                        color = GoldAccent.copy(alpha = 0.85f),
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(4.5.dp)
+                    )
+                }
+            }
+
+            // 4. Complete Book Page Content: Header/Unwan + Body + Bottom Page Folio
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .padding(
+                        horizontal = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
+                        vertical = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 2)).dp
+                    )
             ) {
-                Text(
-                    text = "✦ ✦ ✦",
-                    color = GoldAccent,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
+                // TOP RUNNING BOOK HEADER:
+                // Suppressed on chapter opening page (page 1) as in real printed novels!
+                if (!page.isFirstPageOfChapter) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Right: Novel title in quotes
+                            Text(
+                                text = "« $novelTitle »",
+                                fontFamily = fontFam,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 11.sp,
+                                color = activeTheme.textColor.copy(alpha = 0.72f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
 
-                Text(
-                    text = "— ختم شد —",
-                    fontFamily = fontFam,
-                    fontSize = 12.sp,
-                    color = activeTheme.textColor.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                            // Center: Classic book ornament
+                            Text(
+                                text = "❦  ❖  ❦",
+                                fontSize = 9.sp,
+                                color = GoldAccent.copy(alpha = 0.9f),
+                                modifier = Modifier.padding(horizontal = 6.dp)
+                            )
 
-                Button(
-                    onClick = onNextChapter,
-                    colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
-                    shape = RoundedCornerShape(8.dp),
+                            // Left: Chapter title
+                            Text(
+                                text = chapterTitle,
+                                fontFamily = fontFam,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 11.sp,
+                                color = activeTheme.textColor.copy(alpha = 0.72f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Elegant Book Hairline Rule with Center Diamond
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(0.6.dp)
+                                    .background(activeTheme.textColor.copy(alpha = 0.18f))
+                            )
+                            Text(
+                                text = " ❖ ",
+                                fontSize = 7.sp,
+                                color = GoldAccent.copy(alpha = 0.85f),
+                                modifier = Modifier.padding(horizontal = 3.dp)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(0.6.dp)
+                                    .background(activeTheme.textColor.copy(alpha = 0.18f))
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+                } else {
+                    // CHAPTER OPENING PAGE UNWAN (عنوانِ لوح)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 2.dp, bottom = 6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Bismillah calligraphy
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text("❧ ", color = GoldAccent, fontSize = 12.sp)
+                            Text(
+                                text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                                fontFamily = fontFam,
+                                fontSize = (readerSettings.fontSizeSp * 0.85f).sp,
+                                color = activeTheme.textColor.copy(alpha = 0.9f),
+                                textAlign = TextAlign.Center
+                            )
+                            Text(" ☙", color = GoldAccent, fontSize = 12.sp)
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        // Chapter Heading Box
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = activeTheme.textColor.copy(alpha = 0.04f),
+                            border = BorderStroke(0.8.dp, GoldAccent.copy(alpha = 0.6f)),
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "— ❖ $chapterTitle ❖ —",
+                                    fontFamily = fontFam,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = (readerSettings.fontSizeSp * 0.95f).sp,
+                                    color = EmeraldPrimary,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "« باب نمبر $chapterNumberDisplay از $totalChaptersDisplay »",
+                                    fontFamily = fontFam,
+                                    fontSize = 11.sp,
+                                    color = activeTheme.textColor.copy(alpha = 0.65f),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+
+                // --- PAGE BODY TEXT ---
+                Box(
                     modifier = Modifier
-                        .padding(top = 6.dp)
-                        .testTag("end_of_chapter_next_button")
+                        .fillMaxWidth()
+                        .weight(1f)
                 ) {
                     Text(
-                        text = "اگلا باب پڑھیں",
+                        text = annotatedText,
                         fontFamily = fontFam,
-                        fontSize = 12.sp,
-                        color = Color.White
+                        fontSize = readerSettings.fontSizeSp.sp,
+                        lineHeight = (readerSettings.fontSizeSp * readerSettings.lineHeightMultiplier).sp,
+                        color = activeTheme.textColor,
+                        textAlign = composeTextAlign,
+                        modifier = Modifier.fillMaxWidth()
                     )
+                }
+
+                // --- LAST PAGE COLOPHON (اختتامِ باب) ---
+                if (page.isLastPageOfChapter) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "✦  ❖  ✦",
+                            color = GoldAccent,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            text = "— تمام شد بالخیر —",
+                            fontFamily = fontFam,
+                            fontSize = 12.sp,
+                            color = activeTheme.textColor.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+
+                        Button(
+                            onClick = onNextChapter,
+                            colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .testTag("end_of_chapter_next_button")
+                        ) {
+                            Text(
+                                text = "اگلا باب پڑھیں",
+                                fontFamily = fontFam,
+                                fontSize = 12.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // --- BOTTOM RUNNING BOOK FOLIO (نیچے صفحہ نمبر) ---
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Hairline rule above page number
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(0.6.dp)
+                                .background(activeTheme.textColor.copy(alpha = 0.18f))
+                        )
+                        Text(
+                            text = " ❖ ",
+                            fontSize = 7.sp,
+                            color = GoldAccent.copy(alpha = 0.85f),
+                            modifier = Modifier.padding(horizontal = 3.dp)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(0.6.dp)
+                                .background(activeTheme.textColor.copy(alpha = 0.18f))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Right: Chapter info
+                        Text(
+                            text = "باب $chapterNumberDisplay",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = activeTheme.textColor.copy(alpha = 0.55f)
+                        )
+
+                        // Center: Authentic Printed Page Number
+                        Text(
+                            text = "—  $pageNumberDisplay  —",
+                            fontFamily = fontFam,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = activeTheme.textColor.copy(alpha = 0.9f)
+                        )
+
+                        // Left: Page Count Progress
+                        Text(
+                            text = "$pageNumberDisplay / $totalPagesDisplay",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = activeTheme.textColor.copy(alpha = 0.55f)
+                        )
+                    }
                 }
             }
         }

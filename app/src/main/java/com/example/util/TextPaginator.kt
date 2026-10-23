@@ -116,10 +116,7 @@ object TextPaginator {
         for (p in paragraphs) {
             val pText = p.text.trim()
             if (pText.isEmpty()) {
-                // Blank line represents extra spacing between paragraphs
-                if (currentHeight > 0f) {
-                    currentHeight += paragraphSpacingPx
-                }
+                // Skip empty lines to prevent giant blank gaps inside the printed page
                 continue
             }
 
@@ -132,8 +129,15 @@ object TextPaginator {
                 val lineText = p.text.substring(lineStart, lineEnd)
                 val lineHeight = layout.getLineBottom(line) - layout.getLineTop(line)
 
+                // Page 1 leaves room for the chapter cartouche, while standard pages use the full page body
+                val maxAllowedHeight = if (pages.isEmpty()) {
+                    (heightPx - (textSizePx * 2.2f)).coerceAtLeast(120f)
+                } else {
+                    heightPx.toFloat()
+                }
+
                 // Check if adding this line exceeds available page height
-                if (currentHeight + lineHeight > heightPx && currentPageBuffer.isNotEmpty()) {
+                if (currentHeight + lineHeight > maxAllowedHeight && currentPageBuffer.isNotEmpty()) {
                     finishCurrentPage()
                     currentPageStartOffset = p.startOffset + lineStart
                 }
@@ -147,15 +151,10 @@ object TextPaginator {
                 currentHeight += lineHeight
             }
 
-            // Apply paragraph break cleanly without excessive blank lines
-            if (!currentPageBuffer.endsWith("\n\n")) {
-                if (currentPageBuffer.endsWith("\n")) {
-                    currentPageBuffer.append("\n")
-                } else {
-                    currentPageBuffer.append("\n\n")
-                }
+            // In printed novels, consecutive paragraphs follow on the next line without empty blank lines
+            if (currentPageBuffer.isNotEmpty() && !currentPageBuffer.endsWith("\n")) {
+                currentPageBuffer.append("\n")
             }
-            currentHeight += paragraphSpacingPx
         }
 
         // Finish last remaining page
