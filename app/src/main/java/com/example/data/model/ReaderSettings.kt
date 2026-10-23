@@ -18,10 +18,10 @@ enum class ReaderTheme(
     val textColor: Color,
     val deskColor: Color
 ) {
+    PURE_WHITE("خالص سفید (Pure White)", Color(0xFFFFFFFF), Color(0xFF000000), Color(0xFFFFFFFF)),
     WARM_PAPER("کاغذی (Warm Paper)", ReaderPaperBg, ReaderPaperText, Color(0xFFE8DFC9)),
     SEPIA("سیپیا (Sepia)", ReaderSepiaBg, ReaderSepiaText, Color(0xFFD6C5A2)),
     DARK_MODE("نائٹ موڈ (Dark Mode)", ReaderNightBg, ReaderNightText, Color(0xFF0F1215)),
-    PURE_WHITE("خالص سفید (Pure White)", Color(0xFFFFFFFF), Color(0xFF141414), Color(0xFFE2E6EC)),
     OLED("گہرا سیاہ (OLED)", ReaderOledBg, ReaderOledText, Color(0xFF080808)),
     EMERALD("زمردی (Emerald)", ReaderEmeraldBg, ReaderEmeraldText, Color(0xFF06140D))
 }
@@ -47,11 +47,11 @@ data class ReaderSettings(
     val horizontalMarginDp: Int = 12,
     val verticalMarginDp: Int = 8,
     val alignment: TextAlignmentType = TextAlignmentType.RIGHT_ALIGNED,
-    val theme: ReaderTheme = ReaderTheme.WARM_PAPER,
+    val theme: ReaderTheme = ReaderTheme.PURE_WHITE,
     val fontStyle: FontStyleType = FontStyleType.PDMS_JAUHAR,
     val brightness: Float = 0.85f,
     val autoBookmark: Boolean = true,
-    val showBookFrame: Boolean = true,
+    val showBookFrame: Boolean = false,
     val useUrduNumerals: Boolean = true
 )
 

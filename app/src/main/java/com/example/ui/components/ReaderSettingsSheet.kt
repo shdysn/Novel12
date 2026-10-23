@@ -210,10 +210,10 @@ fun ReaderSettingsSheet(
             Spacer(modifier = Modifier.height(8.dp))
 
             val coreThemes = listOf(
+                ReaderTheme.PURE_WHITE,
                 ReaderTheme.WARM_PAPER,
                 ReaderTheme.SEPIA,
-                ReaderTheme.DARK_MODE,
-                ReaderTheme.PURE_WHITE
+                ReaderTheme.DARK_MODE
             )
 
             Row(

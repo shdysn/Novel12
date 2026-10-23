@@ -236,12 +236,16 @@ class NovelRepository(private val context: Context) {
         } else {
             try { TextAlignmentType.valueOf(savedAlignment) } catch (e: Exception) { TextAlignmentType.RIGHT_ALIGNED }
         }
-        val themeName = prefs.getString("reader_theme", ReaderTheme.WARM_PAPER.name) ?: ReaderTheme.WARM_PAPER.name
-        val theme = try { ReaderTheme.valueOf(themeName) } catch (e: Exception) { ReaderTheme.WARM_PAPER }
+        val savedTheme = prefs.getString("reader_theme", null)
+        val theme = if (savedTheme == null || savedTheme == "WARM_PAPER") {
+            ReaderTheme.PURE_WHITE
+        } else {
+            try { ReaderTheme.valueOf(savedTheme) } catch (e: Exception) { ReaderTheme.PURE_WHITE }
+        }
         val fontStyleName = prefs.getString("font_style", FontStyleType.PDMS_JAUHAR.name) ?: FontStyleType.PDMS_JAUHAR.name
         val fontStyle = try { FontStyleType.valueOf(fontStyleName) } catch (e: Exception) { FontStyleType.PDMS_JAUHAR }
         val brightness = prefs.getFloat("screen_brightness", 0.85f)
-        val showBookFrame = prefs.getBoolean("show_book_frame", true)
+        val showBookFrame = prefs.getBoolean("show_book_frame", false)
         val useUrduNumerals = prefs.getBoolean("use_urdu_numerals", true)
 
         _readerSettings.value = ReaderSettings(

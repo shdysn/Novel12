@@ -81,6 +81,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import com.example.data.model.ReaderTheme
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -184,8 +186,8 @@ fun ReaderScreen(
         val screenHeightDp = maxHeight
 
         // Physical book page sheet padding from surrounding desk surface
-        val sheetHorizPadding = 6.dp
-        val sheetVertPadding = 4.dp
+        val sheetHorizPadding = if (activeTheme == ReaderTheme.PURE_WHITE) 0.dp else 6.dp
+        val sheetVertPadding = if (activeTheme == ReaderTheme.PURE_WHITE) 0.dp else 4.dp
 
         // Dimensions available for pure page text inside the physical book sheet
         val extraHorizPadDp = if (readerSettings.showBookFrame) 16.dp else 6.dp
@@ -291,7 +293,7 @@ fun ReaderScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+                .padding(horizontal = sheetHorizPadding, vertical = sheetVertPadding)
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -879,64 +881,73 @@ private fun SinglePageView(
         }
     }
 
+    val isPureWhite = activeTheme == ReaderTheme.PURE_WHITE
+
     // Authentic Physical Book Page Sheet Container
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .testTag("page_content_${page.pageNumber}"),
-        shape = RoundedCornerShape(
-            topStart = 8.dp,
-            bottomStart = 8.dp,
-            topEnd = 3.dp,
-            bottomEnd = 3.dp
-        ),
+        shape = if (isPureWhite) {
+            RectangleShape
+        } else {
+            RoundedCornerShape(
+                topStart = 8.dp,
+                bottomStart = 8.dp,
+                topEnd = 3.dp,
+                bottomEnd = 3.dp
+            )
+        },
         color = activeTheme.backgroundColor,
-        shadowElevation = 5.dp
+        shadowElevation = if (isPureWhite) 0.dp else 5.dp
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // 1. Stacked Pages Layer Illusion on Left Outer Edge (turning edge in RTL)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
-                    .width(6.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                activeTheme.textColor.copy(alpha = 0.08f),
-                                activeTheme.textColor.copy(alpha = 0.02f),
-                                Color.Transparent
+            // Stacked Pages Layer Illusion & Spine Crease (Only shown in book paper themes, not in pure white)
+            if (!isPureWhite) {
+                // 1. Stacked Pages Layer Illusion on Left Outer Edge (turning edge in RTL)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .fillMaxHeight()
+                        .width(6.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    activeTheme.textColor.copy(alpha = 0.08f),
+                                    activeTheme.textColor.copy(alpha = 0.02f),
+                                    Color.Transparent
+                                )
                             )
                         )
-                    )
-            )
+                )
 
-            // 2. Spine Binding Crease Shadow on Right Inner Edge (binding gutter in RTL)
-            // Curves realistically into the book spine
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .fillMaxHeight()
-                    .width(26.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                activeTheme.textColor.copy(alpha = 0.02f),
-                                activeTheme.textColor.copy(alpha = 0.06f),
-                                activeTheme.textColor.copy(alpha = 0.13f)
+                // 2. Spine Binding Crease Shadow on Right Inner Edge (binding gutter in RTL)
+                // Curves realistically into the book spine
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .width(26.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    activeTheme.textColor.copy(alpha = 0.02f),
+                                    activeTheme.textColor.copy(alpha = 0.06f),
+                                    activeTheme.textColor.copy(alpha = 0.13f)
+                                )
                             )
                         )
-                    )
-            )
-            // Hairline spine gutter fold crease
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .fillMaxHeight()
-                    .width(1.dp)
-                    .background(activeTheme.textColor.copy(alpha = 0.16f))
-            )
+                )
+                // Hairline spine gutter fold crease
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .width(1.dp)
+                        .background(activeTheme.textColor.copy(alpha = 0.16f))
+                )
+            }
 
             // 3. Classical Urdu Double Book Frame (کتابی حاشیہ / جدول)
             if (readerSettings.showBookFrame) {
@@ -1087,16 +1098,16 @@ private fun SinglePageView(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("— ❖ ", color = GoldAccent, fontSize = 11.sp)
+                        Text("— ❖ ", color = if (isPureWhite) Color.Black else GoldAccent, fontSize = 11.sp)
                         Text(
                             text = chapterTitle,
                             fontFamily = fontFam,
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
-                            color = EmeraldPrimary,
+                            color = if (isPureWhite) Color.Black else EmeraldPrimary,
                             textAlign = TextAlign.Center
                         )
-                        Text(" ❖ —", color = GoldAccent, fontSize = 11.sp)
+                        Text(" ❖ —", color = if (isPureWhite) Color.Black else GoldAccent, fontSize = 11.sp)
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -1129,7 +1140,7 @@ private fun SinglePageView(
                     ) {
                         Text(
                             text = "✦  ❖  ✦",
-                            color = GoldAccent,
+                            color = if (isPureWhite) Color.Black else GoldAccent,
                             fontSize = 11.sp,
                             textAlign = TextAlign.Center
                         )
@@ -1138,7 +1149,7 @@ private fun SinglePageView(
                             text = "— تمام شد بالخیر —",
                             fontFamily = fontFam,
                             fontSize = 12.sp,
-                            color = activeTheme.textColor.copy(alpha = 0.7f),
+                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
@@ -1160,19 +1171,19 @@ private fun SinglePageView(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(0.6.dp)
-                                .background(activeTheme.textColor.copy(alpha = 0.18f))
+                                .background(if (isPureWhite) Color(0x33000000) else activeTheme.textColor.copy(alpha = 0.18f))
                         )
                         Text(
                             text = " ❖ ",
                             fontSize = 7.sp,
-                            color = GoldAccent.copy(alpha = 0.85f),
+                            color = if (isPureWhite) Color.Black else GoldAccent.copy(alpha = 0.85f),
                             modifier = Modifier.padding(horizontal = 3.dp)
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(0.6.dp)
-                                .background(activeTheme.textColor.copy(alpha = 0.18f))
+                                .background(if (isPureWhite) Color(0x33000000) else activeTheme.textColor.copy(alpha = 0.18f))
                         )
                     }
 
@@ -1190,7 +1201,7 @@ private fun SinglePageView(
                             text = "باب $chapterNumberDisplay",
                             fontFamily = fontFam,
                             fontSize = 10.sp,
-                            color = activeTheme.textColor.copy(alpha = 0.55f)
+                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.55f)
                         )
 
                         // Center: Authentic Printed Page Number
@@ -1199,7 +1210,7 @@ private fun SinglePageView(
                             fontFamily = fontFam,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = activeTheme.textColor.copy(alpha = 0.9f)
+                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.9f)
                         )
 
                         // Left: Page Count Progress
@@ -1207,7 +1218,7 @@ private fun SinglePageView(
                             text = "$pageNumberDisplay / $totalPagesDisplay",
                             fontFamily = fontFam,
                             fontSize = 10.sp,
-                            color = activeTheme.textColor.copy(alpha = 0.55f)
+                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.55f)
                         )
                     }
                 }
