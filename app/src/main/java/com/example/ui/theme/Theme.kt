@@ -71,8 +71,14 @@ fun UrduNovelReaderTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = createUrduTypography(activeFontFamily),
-            content = content
-        )
+            typography = createUrduTypography(activeFontFamily)
+        ) {
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.material3.LocalTextStyle provides androidx.compose.material3.LocalTextStyle.current.copy(
+                    fontFamily = activeFontFamily
+                ),
+                content = content
+            )
+        }
     }
 }

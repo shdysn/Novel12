@@ -15,7 +15,7 @@ import com.example.data.model.FontStyleType
 // Bundled Urdu Nastaliq & Naskh Fonts
 val NotoNastaliqUrduFontFamily = FontFamily(
     Font(R.font.noto_nastaliq_urdu, FontWeight.Normal),
-    Font(R.font.noto_nastaliq_urdu, FontWeight.Bold)
+    Font(R.font.noto_nastaliq_urdu_bold, FontWeight.Bold)
 )
 
 val MehrNastaliqFontFamily = FontFamily(
@@ -59,6 +59,8 @@ val UrduFontFamily: FontFamily
 
 /**
  * Factory function creating Material3 Typography styled with the specified Urdu FontFamily.
+ * Covers all 15 Material 3 typography tokens to guarantee that every text, label, button,
+ * card, and dialog across the entire application renders in authentic Nastaliq script.
  */
 fun createUrduTypography(fontFamily: FontFamily = NotoNastaliqUrduFontFamily): Typography = Typography(
     displayLarge = TextStyle(
@@ -75,46 +77,74 @@ fun createUrduTypography(fontFamily: FontFamily = NotoNastaliqUrduFontFamily): T
         lineHeight = 42.sp,
         letterSpacing = 0.sp
     ),
-    titleLarge = TextStyle(
+    displaySmall = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 36.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 34.sp,
         letterSpacing = 0.sp
     ),
-    titleMedium = TextStyle(
+    headlineMedium = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 32.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineSmall = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    titleLarge = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 32.sp,
+        letterSpacing = 0.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 17.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
     titleSmall = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
+        fontSize = 15.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 18.sp,
-        lineHeight = 32.sp, // Generous line height for Urdu Nastaliq
+        fontSize = 17.sp,
+        lineHeight = 30.sp, // Generous line height for Urdu Nastaliq
         letterSpacing = 0.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
-        lineHeight = 26.sp,
+        fontSize = 14.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     bodySmall = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 13.sp,
-        lineHeight = 20.sp,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.sp
     ),
     labelLarge = TextStyle(
@@ -122,6 +152,13 @@ fun createUrduTypography(fontFamily: FontFamily = NotoNastaliqUrduFontFamily): T
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 22.sp,
+        letterSpacing = 0.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.sp
     ),
     labelSmall = TextStyle(
