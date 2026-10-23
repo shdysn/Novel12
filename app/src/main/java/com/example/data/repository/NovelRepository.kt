@@ -768,6 +768,15 @@ class NovelRepository(private val context: Context) {
         }
     }
 
+    private fun String.toValidUuidString(): String {
+        if (this.isBlank()) return UUID.randomUUID().toString()
+        return try {
+            UUID.fromString(this).toString()
+        } catch (e: Exception) {
+            UUID.nameUUIDFromBytes(this.toByteArray()).toString()
+        }
+    }
+
     suspend fun pushNovelToSupabase(novelId: String): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val config = _supabaseConfig.value
         if (!config.isConfigured) {
@@ -784,13 +793,15 @@ class NovelRepository(private val context: Context) {
 
             val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date())
 
+            val validNovelId = novel.id.toValidUuidString()
+
             val novelDto = NovelDto(
-                id = novel.id,
+                id = validNovelId,
                 titleUrdu = novel.title,
                 titleEnglish = "",
                 title = novel.title,
                 author = novel.author,
-                authorId = novel.authorId,
+                authorId = novel.authorId?.takeIf { it.isNotBlank() }?.toValidUuidString(),
                 category = novel.category,
                 categoryId = novel.categoryId,
                 description = novel.synopsis,
@@ -808,14 +819,16 @@ class NovelRepository(private val context: Context) {
 
             val novelRes = client.pushNovel(novelDto, config.anonKey, "Bearer ${config.anonKey}")
             if (!novelRes.isSuccessful && novelRes.code() != 409) {
-                return@withContext Pair(false, "ناول پش نہ ہو سکا: کوڈ ${novelRes.code()}")
+                val errBody = novelRes.errorBody()?.string() ?: ""
+                val errorDetail = if (errBody.isNotBlank()) " - $errBody" else ""
+                return@withContext Pair(false, "ناول پش نہ ہو سکا (کوڈ ${novelRes.code()})$errorDetail")
             }
 
             if (chapters.isNotEmpty()) {
                 val chapterDtos = chapters.map { ch ->
                     ChapterDto(
-                        id = ch.id,
-                        novelId = novel.id,
+                        id = ch.id.toValidUuidString(),
+                        novelId = validNovelId,
                         chapterNumber = ch.chapterNumber,
                         chapterTitle = ch.title,
                         title = ch.title,
@@ -829,11 +842,13 @@ class NovelRepository(private val context: Context) {
                 }
                 val chapRes = client.pushChapters(chapterDtos, config.anonKey, "Bearer ${config.anonKey}")
                 if (!chapRes.isSuccessful && chapRes.code() != 409) {
-                    return@withContext Pair(false, "ابواب پش نہ ہو سکے: کوڈ ${chapRes.code()}")
+                    val errBody = chapRes.errorBody()?.string() ?: ""
+                    val errorDetail = if (errBody.isNotBlank()) " - $errBody" else ""
+                    return@withContext Pair(false, "ابواب پش نہ ہو سکے (کوڈ ${chapRes.code()})$errorDetail")
                 }
             }
 
-            Pair(true, "ناول اور ${chapters.size} ابواب کامیابی سے Supabase کلاؤڈ پر پش ہو گئے!")
+            Pair(true, "ناول \"${novel.title}\" اور ${chapters.size} ابواب کامیابی سے Supabase کلاؤڈ پر پش ہو گئے!")
         } catch (e: Exception) {
             Pair(false, "پش کے دوران خرابی: ${e.localizedMessage ?: "نیٹ ورک کا مسئلہ"}")
         } finally {
@@ -967,7 +982,7 @@ class NovelRepository(private val context: Context) {
                         "cover_image_url" to coverImageUrl,
                         "updated_at" to now
                     )
-                    client.updateNovel("eq.$novelId", patchData, config.anonKey, "Bearer ${config.anonKey}")
+                    client.updateNovel("eq.${novelId.toValidUuidString()}", patchData, config.anonKey, "Bearer ${config.anonKey}")
                 }
             }
 
@@ -1025,8 +1040,8 @@ class NovelRepository(private val context: Context) {
                 val client = getApiService(config)
                 if (client != null) {
                     val dto = ChapterDto(
-                        id = chapterId,
-                        novelId = novelId,
+                        id = chapterId.toValidUuidString(),
+                        novelId = novelId.toValidUuidString(),
                         chapterNumber = nextNumber,
                         chapterTitle = newChapter.title,
                         title = newChapter.title,
@@ -1059,7 +1074,7 @@ class NovelRepository(private val context: Context) {
             if (config.isConfigured) {
                 val client = getApiService(config)
                 if (client != null) {
-                    client.deleteNovel("eq.$novelId", config.anonKey, "Bearer ${config.anonKey}")
+                    client.deleteNovel("eq.${novelId.toValidUuidString()}", config.anonKey, "Bearer ${config.anonKey}")
                 }
             }
             Pair(true, "ناول اور تمام متعلقہ ابواب کامیابی سے حذف کر دیے گئے")

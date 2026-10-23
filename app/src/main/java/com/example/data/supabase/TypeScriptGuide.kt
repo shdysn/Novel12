@@ -71,41 +71,33 @@ CREATE INDEX IF NOT EXISTS idx_novels_category ON public.novels (category_id);
 CREATE INDEX IF NOT EXISTS idx_chapters_novel_number ON public.chapters (novel_id, chapter_number);
 CREATE INDEX IF NOT EXISTS idx_chapters_status ON public.chapters (publication_status);
 
--- 7. Row Level Security (RLS) Configuration
+-- 7. Row Level Security (RLS) Configuration & Permissions
 ALTER TABLE public.authors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.novels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chapters ENABLE ROW LEVEL SECURITY;
 
--- Public can read all published novels and their chapters
-CREATE POLICY "Public Read Authors" ON public.authors 
-    FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Read Authors" ON public.authors;
+DROP POLICY IF EXISTS "Admin Insert Authors" ON public.authors;
+DROP POLICY IF EXISTS "Admin Update Authors" ON public.authors;
+DROP POLICY IF EXISTS "Allow All Authors" ON public.authors;
+CREATE POLICY "Allow All Authors" ON public.authors FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-CREATE POLICY "Public Read Categories" ON public.categories 
-    FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Read Categories" ON public.categories;
+DROP POLICY IF EXISTS "Admin Insert Categories" ON public.categories;
+DROP POLICY IF EXISTS "Admin Update Categories" ON public.categories;
+DROP POLICY IF EXISTS "Allow All Categories" ON public.categories;
+CREATE POLICY "Allow All Categories" ON public.categories FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-CREATE POLICY "Public Read Published Novels" ON public.novels 
-    FOR SELECT USING (publication_status = 'published');
+DROP POLICY IF EXISTS "Public Read Published Novels" ON public.novels;
+DROP POLICY IF EXISTS "Admin All Novels" ON public.novels;
+DROP POLICY IF EXISTS "Allow All Novels" ON public.novels;
+CREATE POLICY "Allow All Novels" ON public.novels FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-CREATE POLICY "Public Read Published Chapters" ON public.chapters 
-    FOR SELECT USING (publication_status = 'published');
-
--- Authorized/Admin policies (Allow insert, update, delete with anon/authenticated client)
-CREATE POLICY "Admin Insert Authors" ON public.authors 
-    FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admin Update Authors" ON public.authors 
-    FOR UPDATE USING (true);
-
-CREATE POLICY "Admin Insert Categories" ON public.categories 
-    FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admin Update Categories" ON public.categories 
-    FOR UPDATE USING (true);
-
-CREATE POLICY "Admin All Novels" ON public.novels 
-    FOR ALL USING (true);
-
-CREATE POLICY "Admin All Chapters" ON public.chapters 
-    FOR ALL USING (true);
+DROP POLICY IF EXISTS "Public Read Published Chapters" ON public.chapters;
+DROP POLICY IF EXISTS "Admin All Chapters" ON public.chapters;
+DROP POLICY IF EXISTS "Allow All Chapters" ON public.chapters;
+CREATE POLICY "Allow All Chapters" ON public.chapters FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 -- 8. Storage Bucket for Novel Covers
 INSERT INTO storage.buckets (id, name, public) 
