@@ -267,7 +267,8 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
     // Supabase actions
     fun saveSupabaseSettings(url: String, key: String) {
         repository.saveSupabaseConfig(url, key)
-        showMessage("Supabase کی معلومات محفوظ ہو گئیں")
+        showMessage("Supabase کی معلومات محفوظ ہو گئیں۔ کنکشن ٹیسٹ ہو رہا ہے...")
+        testSupabaseConnection()
     }
 
     fun testSupabaseConnection() {
@@ -286,6 +287,11 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
 
     fun pushNovelToCloud(novelId: String) {
         viewModelScope.launch {
+            if (!repository.supabaseConfig.value.isConfigured) {
+                showMessage("کلاؤڈ پش کے لیے پہلے Supabase URL اور Anon Key درج کریں")
+                return@launch
+            }
+            showMessage("Supabase کلاؤڈ پر ناول پش ہو رہا ہے...")
             val (success, message) = repository.pushNovelToSupabase(novelId)
             showMessage(message)
         }

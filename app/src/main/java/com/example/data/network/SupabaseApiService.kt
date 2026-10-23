@@ -46,7 +46,7 @@ interface SupabaseApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<NovelDto>>
 
-    @Headers("Prefer: return=representation")
+    @Headers("Prefer: resolution=merge-duplicates,return=representation")
     @POST("novels")
     suspend fun pushNovel(
         @Body novel: NovelDto,
@@ -79,7 +79,7 @@ interface SupabaseApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<ChapterDto>>
 
-    @Headers("Prefer: return=representation")
+    @Headers("Prefer: resolution=merge-duplicates,return=representation")
     @POST("chapters")
     suspend fun pushChapters(
         @Body chapters: List<ChapterDto>,
@@ -87,7 +87,7 @@ interface SupabaseApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<ChapterDto>>
 
-    @Headers("Prefer: return=representation")
+    @Headers("Prefer: resolution=merge-duplicates,return=representation")
     @POST("chapters")
     suspend fun pushChapter(
         @Body chapter: ChapterDto,

@@ -236,17 +236,28 @@ fun PublisherScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
+                        Button(
+                            onClick = { showConfigDialog = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = GoldDark),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1.1f)
+                        ) {
+                            Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text("URL / Key درج کریں", fontFamily = UrduFontFamily, fontSize = 11.sp)
+                        }
+
                         Button(
                             onClick = { viewModel.testSupabaseConnection() },
                             colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(imageVector = Icons.Default.Link, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("کنکشن ٹیسٹ", fontFamily = UrduFontFamily, fontSize = 12.sp)
+                            Icon(imageVector = Icons.Default.Link, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text("کنکشن ٹیسٹ", fontFamily = UrduFontFamily, fontSize = 11.sp)
                         }
 
                         OutlinedButton(
@@ -254,9 +265,9 @@ fun PublisherScreen(
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(imageVector = Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("کلاؤڈ سے سنک", fontFamily = UrduFontFamily, fontSize = 12.sp)
+                            Icon(imageVector = Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text("کلاؤڈ سنک", fontFamily = UrduFontFamily, fontSize = 11.sp)
                         }
                     }
                 }
