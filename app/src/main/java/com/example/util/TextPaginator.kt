@@ -132,7 +132,7 @@ object TextPaginator {
 
                 // Effective line height rendered by Jetpack Compose Text(lineHeight = textSize * multiplier)
                 val effectiveComposeLineHeight = textSizePx * lineSpacingMultiplier
-                val lineActualHeight = maxOf(effectiveComposeLineHeight, (layout.getLineBottom(line) - layout.getLineTop(line)) * 0.40f)
+                val lineActualHeight = maxOf(effectiveComposeLineHeight, (layout.getLineBottom(line) - layout.getLineTop(line)).toFloat())
 
                 // Page 1 leaves room for the chapter cartouche, while standard pages use the full page body
                 val maxAllowedHeight = if (pages.isEmpty()) {
