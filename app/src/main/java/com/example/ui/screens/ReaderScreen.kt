@@ -163,11 +163,7 @@ fun ReaderScreen(
         allBookmarks.filter { it.novelId == novel.id }
     }
 
-    val fontFam = when (readerSettings.fontStyle) {
-        FontStyleType.NASTALEEQ -> NotoNastaliqUrduFontFamily
-        FontStyleType.MEHR_NASTALEEQ -> MehrNastaliqFontFamily
-        FontStyleType.NASKH -> AmiriFontFamily
-    }
+    val fontFam = com.example.ui.theme.getFontFamily(readerSettings.fontStyle)
     val activeTheme = readerSettings.theme
 
     val composeTextAlign = when (readerSettings.alignment) {

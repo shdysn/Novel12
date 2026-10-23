@@ -45,6 +45,8 @@ object TextPaginator {
             FontStyleType.NASTALEEQ -> com.example.R.font.noto_nastaliq_urdu
             FontStyleType.MEHR_NASTALEEQ -> com.example.R.font.gulzar
             FontStyleType.NASKH -> com.example.R.font.amiri
+            FontStyleType.LATEEF -> com.example.R.font.lateef
+            FontStyleType.SCHEHERAZADE -> com.example.R.font.scheherazade_new
         }
 
         val loadedTypeface = try {

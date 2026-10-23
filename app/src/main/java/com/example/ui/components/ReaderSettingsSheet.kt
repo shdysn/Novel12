@@ -3,6 +3,7 @@ package com.example.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,11 +69,7 @@ fun ReaderSettingsSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    val fontFam = when (settings.fontStyle) {
-        FontStyleType.NASTALEEQ -> NotoNastaliqUrduFontFamily
-        FontStyleType.MEHR_NASTALEEQ -> MehrNastaliqFontFamily
-        FontStyleType.NASKH -> AmiriFontFamily
-    }
+    val fontFam = com.example.ui.theme.getFontFamily(settings.fontStyle)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -339,23 +336,35 @@ fun ReaderSettingsSheet(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     FilterChip(
                         selected = settings.fontStyle == FontStyleType.NASTALEEQ,
                         onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.NASTALEEQ)) },
-                        label = { Text("جمیل نوری نستعلیق", fontSize = 11.sp) }
+                        label = { Text("نوری نستعلیق", fontSize = 11.sp, fontFamily = UrduFontFamily) }
                     )
                     FilterChip(
                         selected = settings.fontStyle == FontStyleType.MEHR_NASTALEEQ,
                         onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.MEHR_NASTALEEQ)) },
-                        label = { Text("مہر نستعلیق", fontSize = 11.sp) }
+                        label = { Text("مہر نستعلیق", fontSize = 11.sp, fontFamily = UrduFontFamily) }
+                    )
+                    FilterChip(
+                        selected = settings.fontStyle == FontStyleType.LATEEF,
+                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.LATEEF)) },
+                        label = { Text("خطِ لطیف", fontSize = 11.sp, fontFamily = UrduFontFamily) }
+                    )
+                    FilterChip(
+                        selected = settings.fontStyle == FontStyleType.SCHEHERAZADE,
+                        onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.SCHEHERAZADE)) },
+                        label = { Text("خطِ شہزاد", fontSize = 11.sp, fontFamily = UrduFontFamily) }
                     )
                     FilterChip(
                         selected = settings.fontStyle == FontStyleType.NASKH,
                         onClick = { onSettingsChanged(settings.copy(fontStyle = FontStyleType.NASKH)) },
-                        label = { Text("نسخ فونٹ", fontSize = 11.sp) }
+                        label = { Text("امیری نسخ", fontSize = 11.sp, fontFamily = UrduFontFamily) }
                     )
                 }
             }

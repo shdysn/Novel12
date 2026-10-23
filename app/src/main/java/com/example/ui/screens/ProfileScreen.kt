@@ -708,6 +708,8 @@ fun ProfileScreen(
                         subtitle = when (readerSettings.fontStyle) {
                             FontStyleType.NASTALEEQ -> "نوری نستعلیق (خالص اردو خطاطی)"
                             FontStyleType.MEHR_NASTALEEQ -> "مہر نستعلیق (جدید خطاطی)"
+                            FontStyleType.LATEEF -> "خطِ لطیف (روایتی کتابی خط)"
+                            FontStyleType.SCHEHERAZADE -> "خطِ شہزاد (کلاسیک روایتی نسخ)"
                             FontStyleType.NASKH -> "امیری نسخ (عربی و اردو نسخ)"
                         },
                         onClick = { showAppearanceSheet = true }

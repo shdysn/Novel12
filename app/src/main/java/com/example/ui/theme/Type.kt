@@ -29,7 +29,13 @@ val AmiriFontFamily = FontFamily(
 )
 
 val LateefFontFamily = FontFamily(
-    Font(R.font.lateef, FontWeight.Normal)
+    Font(R.font.lateef, FontWeight.Normal),
+    Font(R.font.lateef_bold, FontWeight.Bold)
+)
+
+val ScheherazadeFontFamily = FontFamily(
+    Font(R.font.scheherazade_new, FontWeight.Normal),
+    Font(R.font.scheherazade_new, FontWeight.Bold)
 )
 
 /**
@@ -40,6 +46,8 @@ fun getFontFamily(fontStyle: FontStyleType): FontFamily {
         FontStyleType.NASTALEEQ -> NotoNastaliqUrduFontFamily
         FontStyleType.MEHR_NASTALEEQ -> MehrNastaliqFontFamily
         FontStyleType.NASKH -> AmiriFontFamily
+        FontStyleType.LATEEF -> LateefFontFamily
+        FontStyleType.SCHEHERAZADE -> ScheherazadeFontFamily
     }
 }
 
