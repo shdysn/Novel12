@@ -27,6 +27,7 @@ enum class ReaderTheme(
 }
 
 enum class FontStyleType(val urduLabel: String) {
+    PDMS_JAUHAR("پی ڈی ایم ایس جوہر (PDMS Johur Nastaliq — معیاری)"),
     NASTALEEQ("نوری نستعلیق (Jameel / Noto)"),
     MEHR_NASTALEEQ("مہر نستعلیق (Mehr / Gulzar)"),
     NASKH("جدید نسخ (Amiri Naskh)"),
@@ -47,7 +48,7 @@ data class ReaderSettings(
     val verticalMarginDp: Int = 8,
     val alignment: TextAlignmentType = TextAlignmentType.JUSTIFIED,
     val theme: ReaderTheme = ReaderTheme.WARM_PAPER,
-    val fontStyle: FontStyleType = FontStyleType.NASTALEEQ,
+    val fontStyle: FontStyleType = FontStyleType.PDMS_JAUHAR,
     val brightness: Float = 0.85f,
     val autoBookmark: Boolean = true,
     val showBookFrame: Boolean = true,

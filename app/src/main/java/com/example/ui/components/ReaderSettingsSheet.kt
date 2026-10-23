@@ -327,25 +327,52 @@ fun ReaderSettingsSheet(
 
             // 3. Font Family (PDMS Jauhar Default)
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "رسم الخط (Font Family)",
-                    fontFamily = UrduFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = EmeraldPrimary.copy(alpha = 0.12f)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "PDMS Jauhar (نستعلیق معیاری — طے شدہ)",
+                        text = "رسم الخط (Font Family)",
                         fontFamily = UrduFontFamily,
-                        fontSize = 12.sp,
-                        color = EmeraldPrimary,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = EmeraldPrimary.copy(alpha = 0.12f)
+                    ) {
+                        Text(
+                            text = "طے شدہ: PDMS Jauhar",
+                            fontFamily = UrduFontFamily,
+                            fontSize = 11.sp,
+                            color = EmeraldPrimary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FontStyleType.entries.forEach { style ->
+                        FilterChip(
+                            selected = settings.fontStyle == style,
+                            onClick = { onSettingsChanged(settings.copy(fontStyle = style)) },
+                            label = {
+                                Text(
+                                    text = style.urduLabel,
+                                    fontFamily = com.example.ui.theme.getFontFamily(style),
+                                    fontSize = 12.sp
+                                )
+                            }
+                        )
+                    }
                 }
             }
 

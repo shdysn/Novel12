@@ -53,7 +53,7 @@ private val LightColorScheme = lightColorScheme(
 fun UrduNovelReaderTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // Keep bespoke Urdu green-gold palette by default
-    fontStyle: FontStyleType = FontStyleType.NASTALEEQ,
+    fontStyle: FontStyleType = FontStyleType.PDMS_JAUHAR,
     content: @Composable () -> Unit
 ) {
     val activeFontFamily = getFontFamily(fontStyle)

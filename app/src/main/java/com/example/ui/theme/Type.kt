@@ -13,6 +13,10 @@ import com.example.R
 import com.example.data.model.FontStyleType
 
 // Bundled Urdu Nastaliq & Naskh Fonts
+val PdmsJauharFontFamily = FontFamily(
+    Font(R.font.pdms_jauhar, FontWeight.Normal)
+)
+
 val NotoNastaliqUrduFontFamily = FontFamily(
     Font(R.font.noto_nastaliq_urdu, FontWeight.Normal),
     Font(R.font.noto_nastaliq_urdu_bold, FontWeight.Bold)
@@ -43,6 +47,7 @@ val ScheherazadeFontFamily = FontFamily(
  */
 fun getFontFamily(fontStyle: FontStyleType): FontFamily {
     return when (fontStyle) {
+        FontStyleType.PDMS_JAUHAR -> PdmsJauharFontFamily
         FontStyleType.NASTALEEQ -> NotoNastaliqUrduFontFamily
         FontStyleType.MEHR_NASTALEEQ -> MehrNastaliqFontFamily
         FontStyleType.NASKH -> AmiriFontFamily
@@ -54,7 +59,7 @@ fun getFontFamily(fontStyle: FontStyleType): FontFamily {
 /**
  * CompositionLocal providing the currently active Urdu font family across all screens.
  */
-val LocalUrduFontFamily = compositionLocalOf<FontFamily> { NotoNastaliqUrduFontFamily }
+val LocalUrduFontFamily = compositionLocalOf<FontFamily> { PdmsJauharFontFamily }
 
 /**
  * Dynamic UrduFontFamily that resolves to the currently selected font family from LocalUrduFontFamily.
@@ -70,7 +75,7 @@ val UrduFontFamily: FontFamily
  * Covers all 15 Material 3 typography tokens to guarantee that every text, label, button,
  * card, and dialog across the entire application renders in authentic Nastaliq script.
  */
-fun createUrduTypography(fontFamily: FontFamily = NotoNastaliqUrduFontFamily): Typography = Typography(
+fun createUrduTypography(fontFamily: FontFamily = PdmsJauharFontFamily): Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Bold,
@@ -178,4 +183,4 @@ fun createUrduTypography(fontFamily: FontFamily = NotoNastaliqUrduFontFamily): T
     )
 )
 
-val Typography = createUrduTypography(NotoNastaliqUrduFontFamily)
+val Typography = createUrduTypography(PdmsJauharFontFamily)

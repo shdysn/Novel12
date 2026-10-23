@@ -42,6 +42,7 @@ object TextPaginator {
         }
 
         val fontResId = when (fontStyle) {
+            FontStyleType.PDMS_JAUHAR -> com.example.R.font.pdms_jauhar
             FontStyleType.NASTALEEQ -> com.example.R.font.noto_nastaliq_urdu
             FontStyleType.MEHR_NASTALEEQ -> com.example.R.font.gulzar
             FontStyleType.NASKH -> com.example.R.font.amiri

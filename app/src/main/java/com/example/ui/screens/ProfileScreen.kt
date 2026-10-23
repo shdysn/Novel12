@@ -706,6 +706,7 @@ fun ProfileScreen(
                         icon = Icons.Default.FontDownload,
                         title = "اردو رسم الخط (Nastaliq Calligraphy)",
                         subtitle = when (readerSettings.fontStyle) {
+                            FontStyleType.PDMS_JAUHAR -> "پی ڈی ایم ایس جوہر (PDMS Johur Nastaliq — اصل خطاطی)"
                             FontStyleType.NASTALEEQ -> "نوری نستعلیق (خالص اردو خطاطی)"
                             FontStyleType.MEHR_NASTALEEQ -> "مہر نستعلیق (جدید خطاطی)"
                             FontStyleType.LATEEF -> "خطِ لطیف (روایتی کتابی خط)"

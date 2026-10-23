@@ -234,8 +234,8 @@ class NovelRepository(private val context: Context) {
         val alignment = try { TextAlignmentType.valueOf(alignmentName) } catch (e: Exception) { TextAlignmentType.JUSTIFIED }
         val themeName = prefs.getString("reader_theme", ReaderTheme.WARM_PAPER.name) ?: ReaderTheme.WARM_PAPER.name
         val theme = try { ReaderTheme.valueOf(themeName) } catch (e: Exception) { ReaderTheme.WARM_PAPER }
-        val fontStyleName = prefs.getString("font_style", FontStyleType.NASTALEEQ.name) ?: FontStyleType.NASTALEEQ.name
-        val fontStyle = try { FontStyleType.valueOf(fontStyleName) } catch (e: Exception) { FontStyleType.NASTALEEQ }
+        val fontStyleName = prefs.getString("font_style", FontStyleType.PDMS_JAUHAR.name) ?: FontStyleType.PDMS_JAUHAR.name
+        val fontStyle = try { FontStyleType.valueOf(fontStyleName) } catch (e: Exception) { FontStyleType.PDMS_JAUHAR }
         val brightness = prefs.getFloat("screen_brightness", 0.85f)
         val showBookFrame = prefs.getBoolean("show_book_frame", true)
         val useUrduNumerals = prefs.getBoolean("use_urdu_numerals", true)

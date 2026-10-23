@@ -29,7 +29,7 @@ class ExampleRobolectricTest {
         textSizePx = 40f,
         lineSpacingMultiplier = 1.8f,
         paragraphSpacingPx = 20f,
-        fontStyle = com.example.data.model.FontStyleType.NASTALEEQ
+        fontStyle = com.example.data.model.FontStyleType.PDMS_JAUHAR
     )
     org.junit.Assert.assertTrue(pages.isNotEmpty())
     assertEquals(1, pages.first().pageNumber)
