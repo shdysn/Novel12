@@ -129,17 +129,20 @@ object TextPaginator {
                 val lineStart = layout.getLineStart(line)
                 val lineEnd = layout.getLineEnd(line)
                 val lineText = p.text.substring(lineStart, lineEnd)
-                val lineHeight = layout.getLineBottom(line) - layout.getLineTop(line)
+
+                // Effective line height rendered by Jetpack Compose Text(lineHeight = textSize * multiplier)
+                val effectiveComposeLineHeight = textSizePx * lineSpacingMultiplier
+                val lineActualHeight = maxOf(effectiveComposeLineHeight, (layout.getLineBottom(line) - layout.getLineTop(line)) * 0.40f)
 
                 // Page 1 leaves room for the chapter cartouche, while standard pages use the full page body
                 val maxAllowedHeight = if (pages.isEmpty()) {
-                    (heightPx - (textSizePx * 2.2f)).coerceAtLeast(120f)
+                    (heightPx - (textSizePx * 2.8f)).coerceAtLeast(120f)
                 } else {
                     heightPx.toFloat()
                 }
 
                 // Check if adding this line exceeds available page height
-                if (currentHeight + lineHeight > maxAllowedHeight && currentPageBuffer.isNotEmpty()) {
+                if (currentHeight + lineActualHeight > maxAllowedHeight && currentPageBuffer.isNotEmpty()) {
                     finishCurrentPage()
                     currentPageStartOffset = p.startOffset + lineStart
                 }
@@ -150,12 +153,13 @@ object TextPaginator {
 
                 currentPageBuffer.append(lineText)
                 currentPageEndOffset = p.startOffset + lineEnd
-                currentHeight += lineHeight
+                currentHeight += lineActualHeight
             }
 
-            // In printed novels, consecutive paragraphs follow on the next line without empty blank lines
+            // In printed novels, consecutive paragraphs follow on the next line with paragraph spacing
             if (currentPageBuffer.isNotEmpty() && !currentPageBuffer.endsWith("\n")) {
                 currentPageBuffer.append("\n")
+                currentHeight += paragraphSpacingPx
             }
         }
 
