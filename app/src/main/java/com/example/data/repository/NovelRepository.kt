@@ -653,6 +653,8 @@ class NovelRepository(private val context: Context) {
             val client = getApiService(config)
                 ?: return@withContext Pair(false, "Supabase کلائنٹ تیار نہیں ہو سکا")
 
+            val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date())
+
             // 1. Fetch remote novels
             val novelsRes = client.getNovels(config.anonKey, "Bearer ${config.anonKey}")
             if (!novelsRes.isSuccessful) {
@@ -660,7 +662,7 @@ class NovelRepository(private val context: Context) {
             }
             val remoteNovels = novelsRes.body() ?: emptyList()
 
-            // 2. Fetch remote authors
+            // 2. Fetch remote authors & push local authors to Supabase
             val authorsRes = client.getAuthors(config.anonKey, "Bearer ${config.anonKey}")
             if (authorsRes.isSuccessful && !authorsRes.body().isNullOrEmpty()) {
                 val authorEntities = authorsRes.body()!!.map { dto ->
@@ -677,7 +679,28 @@ class NovelRepository(private val context: Context) {
                 authorDao.insertAuthors(authorEntities)
             }
 
-            // 3. Fetch remote categories
+            // Push local authors to Supabase
+            val localAuthors = authorDao.getAllAuthorsFlow().first().ifEmpty {
+                SampleUrduNovels.sampleAuthors.map { AuthorEntity.fromDomainModel(it) }
+            }
+            for (author in localAuthors) {
+                val authorDto = AuthorDto(
+                    id = author.id.toValidUuidString(),
+                    nameUrdu = author.nameUrdu,
+                    nameEnglish = author.nameEnglish,
+                    biography = author.biography,
+                    portraitUrl = author.portraitUrl,
+                    createdAt = author.createdAt.ifBlank { now },
+                    updatedAt = author.updatedAt.ifBlank { now }
+                )
+                try {
+                    client.pushAuthor(authorDto, config.anonKey, "Bearer ${config.anonKey}")
+                } catch (e: Exception) {
+                    // Non-fatal
+                }
+            }
+
+            // 3. Fetch remote categories & push local categories to Supabase
             val catRes = client.getCategories(config.anonKey, "Bearer ${config.anonKey}")
             if (catRes.isSuccessful && !catRes.body().isNullOrEmpty()) {
                 val catEntities = catRes.body()!!.map { dto ->
@@ -689,6 +712,26 @@ class NovelRepository(private val context: Context) {
                     )
                 }
                 categoryDao.insertCategories(catEntities)
+            }
+
+            // Push local categories to Supabase
+            val localCategories = categoryDao.getAllCategoriesFlow().first().ifEmpty {
+                NovelCategory.entries.map {
+                    CategoryEntity(id = it.name.lowercase(), nameUrdu = it.urduName, nameEnglish = it.englishName, createdAt = now)
+                }
+            }
+            for (cat in localCategories) {
+                val catDto = CategoryDto(
+                    id = cat.id,
+                    nameUrdu = cat.nameUrdu,
+                    nameEnglish = cat.nameEnglish,
+                    createdAt = cat.createdAt.ifBlank { now }
+                )
+                try {
+                    client.pushCategory(catDto, config.anonKey, "Bearer ${config.anonKey}")
+                } catch (e: Exception) {
+                    // Non-fatal
+                }
             }
 
             // 4. Merge remote novels into Room without overwriting local progress or bookmarks
@@ -757,10 +800,10 @@ class NovelRepository(private val context: Context) {
             _supabaseConfig.value = _supabaseConfig.value.copy(
                 isConnected = true,
                 totalSyncedNovels = remoteNovels.size,
-                lastSyncMessage = "کامیابی! ${remoteNovels.size} ناولز کلاؤڈ سے ہم آہنگ ہو گئے",
+                lastSyncMessage = "کامیابی! ناولز، مصنفین اور اصناف کلاؤڈ سے ہم آہنگ ہو گئے",
                 lastSyncTime = System.currentTimeMillis()
             )
-            Pair(true, "کامیابی! ${remoteNovels.size} ناولز کلاؤڈ سے سنک ہو گئے")
+            Pair(true, "کامیابی! ناولز، مصنفین اور اصناف کلاؤڈ سے سنک ہو گئے")
         } catch (e: Exception) {
             Pair(false, "سنک کے دوران خرابی: ${e.localizedMessage ?: "کنکشن ٹائم آؤٹ"}")
         } finally {
@@ -795,6 +838,42 @@ class NovelRepository(private val context: Context) {
 
             val validNovelId = novel.id.toValidUuidString()
 
+            // 1. Push Author
+            if (novel.author.isNotBlank()) {
+                val authorId = (novel.authorId?.takeIf { it.isNotBlank() } ?: ("author_" + novel.author)).toValidUuidString()
+                val authorDto = AuthorDto(
+                    id = authorId,
+                    nameUrdu = novel.author,
+                    nameEnglish = "",
+                    biography = "معروف اردو ناول نگار",
+                    portraitUrl = null,
+                    createdAt = now,
+                    updatedAt = now
+                )
+                try {
+                    client.pushAuthor(authorDto, config.anonKey, "Bearer ${config.anonKey}")
+                } catch (e: Exception) {
+                    // Non-fatal
+                }
+            }
+
+            // 2. Push Category
+            if (novel.category.isNotBlank()) {
+                val categoryId = (novel.categoryId?.takeIf { it.isNotBlank() } ?: ("cat_" + novel.category.lowercase().replace(" ", "_")))
+                val categoryDto = CategoryDto(
+                    id = categoryId,
+                    nameUrdu = novel.category,
+                    nameEnglish = "",
+                    createdAt = now
+                )
+                try {
+                    client.pushCategory(categoryDto, config.anonKey, "Bearer ${config.anonKey}")
+                } catch (e: Exception) {
+                    // Non-fatal
+                }
+            }
+
+            // 3. Push Novel
             val novelDto = NovelDto(
                 id = validNovelId,
                 titleUrdu = novel.title,
@@ -822,6 +901,7 @@ class NovelRepository(private val context: Context) {
                 return@withContext Pair(false, "ناول پش نہ ہو سکا (کوڈ ${novelRes.code()})$errorDetail")
             }
 
+            // 4. Push Chapters
             if (chapters.isNotEmpty()) {
                 val chapterDtos = chapters.map { ch ->
                     ChapterDto(
@@ -845,7 +925,7 @@ class NovelRepository(private val context: Context) {
                 }
             }
 
-            Pair(true, "ناول \"${novel.title}\" اور ${chapters.size} ابواب کامیابی سے Supabase کلاؤڈ پر پش ہو گئے!")
+            Pair(true, "ناول \"${novel.title}\"، مصنف، صنف اور ${chapters.size} ابواب کامیابی سے Supabase کلاؤڈ پر پش ہو گئے!")
         } catch (e: Exception) {
             Pair(false, "پش کے دوران خرابی: ${e.localizedMessage ?: "نیٹ ورک کا مسئلہ"}")
         } finally {

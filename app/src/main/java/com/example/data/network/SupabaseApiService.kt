@@ -118,7 +118,7 @@ interface SupabaseApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<AuthorDto>>
 
-    @Headers("Prefer: return=representation")
+    @Headers("Prefer: resolution=merge-duplicates,return=representation")
     @POST("authors")
     suspend fun pushAuthor(
         @Body author: AuthorDto,
@@ -140,7 +140,7 @@ interface SupabaseApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<CategoryDto>>
 
-    @Headers("Prefer: return=representation")
+    @Headers("Prefer: resolution=merge-duplicates,return=representation")
     @POST("categories")
     suspend fun pushCategory(
         @Body category: CategoryDto,
