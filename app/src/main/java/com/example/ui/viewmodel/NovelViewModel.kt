@@ -55,6 +55,11 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
     val supabaseConfig: StateFlow<SupabaseConfig> = repository.supabaseConfig
     val isSyncing: StateFlow<Boolean> = repository.syncingState
     val downloadStatuses: StateFlow<Map<String, com.example.data.local.DownloadStatus>> = repository.downloadStatuses
+    val userName: StateFlow<String> = repository.userName
+    val userTitle: StateFlow<String> = repository.userTitle
+    val userEmail: StateFlow<String> = repository.userEmail
+    val dailyGoalMinutes: StateFlow<Int> = repository.dailyGoalMinutes
+    val isVipMember: StateFlow<Boolean> = repository.isVipMember
 
     // Specialized Novel Sections for Home Screen
     val continueReadingNovels: StateFlow<List<Novel>> = repository.novels.map { list ->
@@ -138,6 +143,16 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
     fun clearReadingHistory() {
         repository.clearReadingHistory()
         showMessage("مطالعہ کی تاریخ صاف کر دی گئی")
+    }
+
+    fun updateProfile(name: String, title: String, email: String) {
+        repository.updateProfile(name, title, email)
+        showMessage("پروفائل کامیابی سے اپ ڈیٹ ہو گئی")
+    }
+
+    fun setDailyGoalMinutes(minutes: Int) {
+        repository.setDailyGoalMinutes(minutes)
+        showMessage("روزانہ مطالعہ کا ہدف $minutes منٹ مقرر ہو گیا")
     }
 
     fun navigateToDetail(novelId: String) {

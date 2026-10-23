@@ -88,6 +88,7 @@ import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.GoldDark
+import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -308,7 +309,7 @@ fun PublisherScreen(
                     ) {
                         Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("نیا باب شامل کریں", fontFamily = FontFamily.Serif, fontSize = 13.sp)
+                        Text("نیا باب شامل کریں", fontFamily = UrduFontFamily, fontSize = 13.sp)
                     }
                 }
 
@@ -326,7 +327,7 @@ fun PublisherScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Supabase SQL اسکیما، RLS پالیسیز اور اسکرپٹس",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     )
@@ -345,14 +346,14 @@ fun PublisherScreen(
             ) {
                 Text(
                     text = "تمام رجسٹرڈ ناولز (${allNovels.size})",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "ڈرافٹ اور شائع شدہ",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = EmeraldPrimary
                 )
@@ -377,7 +378,7 @@ fun PublisherScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = novel.title,
-                                    fontFamily = FontFamily.Serif,
+                                    fontFamily = UrduFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -389,7 +390,7 @@ fun PublisherScreen(
                                 ) {
                                     Text(
                                         text = if (novel.isDraft) "ڈرافٹ" else "شائع شدہ",
-                                        fontFamily = FontFamily.Serif,
+                                        fontFamily = UrduFontFamily,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = if (novel.isDraft) Color(0xFFE65100) else EmeraldPrimary,
@@ -399,7 +400,7 @@ fun PublisherScreen(
                             }
                             Text(
                                 text = "مصنف: ${novel.author}  •  ${novel.category}  •  ${novel.totalChapters} ابواب",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 2.dp)
@@ -413,7 +414,7 @@ fun PublisherScreen(
                         ) {
                             Text(
                                 text = if (novel.isDownloaded) "آف لائن کیشے" else "کلاؤڈ پر دستیاب",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 10.sp,
                                 color = MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -438,7 +439,7 @@ fun PublisherScreen(
                         ) {
                             Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("ترمیم", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                            Text("ترمیم", fontFamily = UrduFontFamily, fontSize = 11.sp)
                         }
 
                         // Upload cover button
@@ -450,7 +451,7 @@ fun PublisherScreen(
                         ) {
                             Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("سرورق", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                            Text("سرورق", fontFamily = UrduFontFamily, fontSize = 11.sp)
                         }
 
                         // Push to Cloud
@@ -463,7 +464,7 @@ fun PublisherScreen(
                         ) {
                             Icon(imageVector = Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("کلاؤڈ پش", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                            Text("کلاؤڈ پش", fontFamily = UrduFontFamily, fontSize = 11.sp)
                         }
 
                         // Delete
@@ -494,7 +495,7 @@ fun PublisherScreen(
             title = {
                 Text(
                     text = "Supabase کی ترتیبات درج کریں",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
@@ -503,7 +504,7 @@ fun PublisherScreen(
                 Column {
                     Text(
                         text = "اپنے Supabase پراجیکٹ کا URL اور anon/public کی درج کریں۔ سیکیورٹی کی خاطر service_role کی ایپ میں کبھی درج نہ کریں۔",
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -533,12 +534,12 @@ fun PublisherScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
                 ) {
-                    Text("محفوظ کریں", fontFamily = FontFamily.Serif)
+                    Text("محفوظ کریں", fontFamily = UrduFontFamily)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showConfigDialog = false }) {
-                    Text("منسوخ", fontFamily = FontFamily.Serif)
+                    Text("منسوخ", fontFamily = UrduFontFamily)
                 }
             }
         )
@@ -603,7 +604,7 @@ fun PublisherScreen(
             title = {
                 Text(
                     text = "ناول حذف کرنے کی تصدیق",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
@@ -611,7 +612,7 @@ fun PublisherScreen(
             text = {
                 Text(
                     text = "کیا آپ واقعی ناول \"${deletingNovel!!.title}\" اور اس کے تمام ابواب کو لوکل ڈیٹابیس اور کلاؤڈ سے مستقل طور پر حذف کرنا چاہتے ہیں؟",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
                     lineHeight = 20.sp
                 )
@@ -625,12 +626,12 @@ fun PublisherScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("ہاں، حذف کریں", fontFamily = FontFamily.Serif)
+                    Text("ہاں، حذف کریں", fontFamily = UrduFontFamily)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { deletingNovel = null }) {
-                    Text("منسوخ", fontFamily = FontFamily.Serif)
+                    Text("منسوخ", fontFamily = UrduFontFamily)
                 }
             }
         )
@@ -688,7 +689,7 @@ private fun CreateNovelDialog(
         title = {
             Text(
                 text = "نیا اردو ناول تحریر و شائع کریں",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -707,13 +708,13 @@ private fun CreateNovelDialog(
                     FilterChip(
                         selected = publicationStatus == "published",
                         onClick = { publicationStatus = "published" },
-                        label = { Text("شائع کریں (Published)", fontFamily = FontFamily.Serif, fontSize = 11.sp) },
+                        label = { Text("شائع کریں (Published)", fontFamily = UrduFontFamily, fontSize = 11.sp) },
                         colors = FilterChipDefaults.filterChipColors(selectedContainerColor = EmeraldPrimary)
                     )
                     FilterChip(
                         selected = publicationStatus == "draft",
                         onClick = { publicationStatus = "draft" },
-                        label = { Text("ڈرافٹ کے طور پر محفوظ (Draft)", fontFamily = FontFamily.Serif, fontSize = 11.sp) }
+                        label = { Text("ڈرافٹ کے طور پر محفوظ (Draft)", fontFamily = UrduFontFamily, fontSize = 11.sp) }
                     )
                 }
 
@@ -722,7 +723,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("ناول کا اردو عنوان *", fontFamily = FontFamily.Serif) },
+                    label = { Text("ناول کا اردو عنوان *", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -730,7 +731,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = author,
                     onValueChange = { author = it },
-                    label = { Text("مصنف کا نام *", fontFamily = FontFamily.Serif) },
+                    label = { Text("مصنف کا نام *", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -738,7 +739,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = category,
                     onValueChange = { category = it },
-                    label = { Text("صنف (رومانوی، سماجی، روحانی، تاریخی)", fontFamily = FontFamily.Serif) },
+                    label = { Text("صنف (رومانوی، سماجی، روحانی، تاریخی)", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -746,7 +747,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = synopsis,
                     onValueChange = { synopsis = it },
-                    label = { Text("ناول کا خلاصہ", fontFamily = FontFamily.Serif) },
+                    label = { Text("ناول کا خلاصہ", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3
@@ -755,7 +756,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = coverUrl,
                     onValueChange = { coverUrl = it },
-                    label = { Text("سرورق تصویر کا URL (اختیاری)", fontFamily = FontFamily.Serif) },
+                    label = { Text("سرورق تصویر کا URL (اختیاری)", fontFamily = UrduFontFamily) },
                     placeholder = { Text("https://...") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -763,7 +764,7 @@ private fun CreateNovelDialog(
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "پہلا باب (First Chapter):",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
@@ -771,7 +772,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = chTitle,
                     onValueChange = { chTitle = it },
-                    label = { Text("باب کا عنوان", fontFamily = FontFamily.Serif) },
+                    label = { Text("باب کا عنوان", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -779,7 +780,7 @@ private fun CreateNovelDialog(
                 OutlinedTextField(
                     value = chContent,
                     onValueChange = { chContent = it },
-                    label = { Text("باب کا یونیکوڈ اردو متن *", fontFamily = FontFamily.Serif) },
+                    label = { Text("باب کا یونیکوڈ اردو متن *", fontFamily = UrduFontFamily) },
                     placeholder = { Text("یہاں مکمل اردو متن پیسٹ یا ٹائپ کریں...") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 4,
@@ -803,12 +804,12 @@ private fun CreateNovelDialog(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
             ) {
-                Text(if (publicationStatus == "draft") "ڈرافٹ محفوظ کریں" else "شائع کریں", fontFamily = FontFamily.Serif)
+                Text(if (publicationStatus == "draft") "ڈرافٹ محفوظ کریں" else "شائع کریں", fontFamily = UrduFontFamily)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("منسوخ", fontFamily = FontFamily.Serif)
+                Text("منسوخ", fontFamily = UrduFontFamily)
             }
         }
     )
@@ -833,7 +834,7 @@ private fun EditNovelDialog(
         title = {
             Text(
                 text = "ناول کی معلومات میں ترمیم",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -851,13 +852,13 @@ private fun EditNovelDialog(
                     FilterChip(
                         selected = publicationStatus == "published",
                         onClick = { publicationStatus = "published" },
-                        label = { Text("شائع شدہ", fontFamily = FontFamily.Serif, fontSize = 11.sp) },
+                        label = { Text("شائع شدہ", fontFamily = UrduFontFamily, fontSize = 11.sp) },
                         colors = FilterChipDefaults.filterChipColors(selectedContainerColor = EmeraldPrimary)
                     )
                     FilterChip(
                         selected = publicationStatus == "draft",
                         onClick = { publicationStatus = "draft" },
-                        label = { Text("ڈرافٹ", fontFamily = FontFamily.Serif, fontSize = 11.sp) }
+                        label = { Text("ڈرافٹ", fontFamily = UrduFontFamily, fontSize = 11.sp) }
                     )
                 }
 
@@ -865,28 +866,28 @@ private fun EditNovelDialog(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("عنوان", fontFamily = FontFamily.Serif) },
+                    label = { Text("عنوان", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = author,
                     onValueChange = { author = it },
-                    label = { Text("مصنف", fontFamily = FontFamily.Serif) },
+                    label = { Text("مصنف", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = category,
                     onValueChange = { category = it },
-                    label = { Text("صنف", fontFamily = FontFamily.Serif) },
+                    label = { Text("صنف", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = synopsis,
                     onValueChange = { synopsis = it },
-                    label = { Text("خلاصہ", fontFamily = FontFamily.Serif) },
+                    label = { Text("خلاصہ", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4
@@ -895,7 +896,7 @@ private fun EditNovelDialog(
                 OutlinedTextField(
                     value = coverUrl,
                     onValueChange = { coverUrl = it },
-                    label = { Text("سرورق تصویر کا URL", fontFamily = FontFamily.Serif) },
+                    label = { Text("سرورق تصویر کا URL", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -905,12 +906,12 @@ private fun EditNovelDialog(
                 onClick = { onSave(novel.id, title, author, category, synopsis, publicationStatus, coverUrl.ifBlank { null }) },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
             ) {
-                Text("محفوظ کریں", fontFamily = FontFamily.Serif)
+                Text("محفوظ کریں", fontFamily = UrduFontFamily)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("منسوخ", fontFamily = FontFamily.Serif)
+                Text("منسوخ", fontFamily = UrduFontFamily)
             }
         }
     )
@@ -935,7 +936,7 @@ private fun UploadCoverDialog(
         title = {
             Text(
                 text = "سرورق تصویر کا انتخاب (Supabase Storage)",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp
             )
@@ -944,7 +945,7 @@ private fun UploadCoverDialog(
             Column {
                 Text(
                     text = "ناول \"${novel.title}\" کے لیے سرورق منتخب کریں۔ تصویر کا سائز 5MB سے کم ہونا ضروری ہے۔",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -971,7 +972,7 @@ private fun UploadCoverDialog(
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = label,
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedSampleIndex == index) FontWeight.Bold else FontWeight.Normal
                             )
@@ -989,12 +990,12 @@ private fun UploadCoverDialog(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
             ) {
-                Text("اپ لوڈ کریں", fontFamily = FontFamily.Serif)
+                Text("اپ لوڈ کریں", fontFamily = UrduFontFamily)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("منسوخ", fontFamily = FontFamily.Serif)
+                Text("منسوخ", fontFamily = UrduFontFamily)
             }
         }
     )
@@ -1019,7 +1020,7 @@ private fun AddChapterDialog(
         title = {
             Text(
                 text = "ناول میں نیا باب شامل کریں",
-                fontFamily = FontFamily.Serif,
+                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -1032,7 +1033,7 @@ private fun AddChapterDialog(
             ) {
                 Text(
                     text = "منتخب ناول:",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -1055,7 +1056,7 @@ private fun AddChapterDialog(
                     ) {
                         novels.forEach { novel ->
                             DropdownMenuItem(
-                                text = { Text(novel.title, fontFamily = FontFamily.Serif) },
+                                text = { Text(novel.title, fontFamily = UrduFontFamily) },
                                 onClick = {
                                     selectedNovel = novel
                                     expanded = false
@@ -1074,13 +1075,13 @@ private fun AddChapterDialog(
                     FilterChip(
                         selected = publicationStatus == "published",
                         onClick = { publicationStatus = "published" },
-                        label = { Text("شائع کریں", fontFamily = FontFamily.Serif, fontSize = 11.sp) },
+                        label = { Text("شائع کریں", fontFamily = UrduFontFamily, fontSize = 11.sp) },
                         colors = FilterChipDefaults.filterChipColors(selectedContainerColor = EmeraldPrimary)
                     )
                     FilterChip(
                         selected = publicationStatus == "draft",
                         onClick = { publicationStatus = "draft" },
-                        label = { Text("ڈرافٹ", fontFamily = FontFamily.Serif, fontSize = 11.sp) }
+                        label = { Text("ڈرافٹ", fontFamily = UrduFontFamily, fontSize = 11.sp) }
                     )
                 }
 
@@ -1089,7 +1090,7 @@ private fun AddChapterDialog(
                 OutlinedTextField(
                     value = chapterTitle,
                     onValueChange = { chapterTitle = it },
-                    label = { Text("باب کا عنوان (مثلاً باب دوم)", fontFamily = FontFamily.Serif) },
+                    label = { Text("باب کا عنوان (مثلاً باب دوم)", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -1098,14 +1099,14 @@ private fun AddChapterDialog(
                 OutlinedTextField(
                     value = chapterContent,
                     onValueChange = { chapterContent = it },
-                    label = { Text("باب کا مکمل اردو متن *", fontFamily = FontFamily.Serif) },
+                    label = { Text("باب کا مکمل اردو متن *", fontFamily = UrduFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 5,
                     maxLines = 8
                 )
                 Text(
                     text = "الفاظ: ${if (chapterContent.isBlank()) 0 else chapterContent.trim().split(Regex("\\s+")).size}",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.padding(top = 4.dp)
@@ -1117,12 +1118,12 @@ private fun AddChapterDialog(
                 onClick = { onAdd(selectedNovel.id, chapterTitle, chapterContent, publicationStatus) },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
             ) {
-                Text("شامل کریں", fontFamily = FontFamily.Serif)
+                Text("شامل کریں", fontFamily = UrduFontFamily)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("منسوخ", fontFamily = FontFamily.Serif)
+                Text("منسوخ", fontFamily = UrduFontFamily)
             }
         }
     )
@@ -1146,7 +1147,7 @@ private fun TypeScriptGuideDialog(
             ) {
                 Text(
                     text = "Supabase SQL اسکیما اور کوڈ گائیڈ",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
@@ -1203,7 +1204,7 @@ private fun TypeScriptGuideDialog(
                     ) {
                         Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("کاپی کریں", fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                        Text("کاپی کریں", fontFamily = UrduFontFamily, fontSize = 11.sp)
                     }
                 }
 
@@ -1234,7 +1235,7 @@ private fun TypeScriptGuideDialog(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
             ) {
-                Text("بند کریں", fontFamily = FontFamily.Serif)
+                Text("بند کریں", fontFamily = UrduFontFamily)
             }
         }
     )

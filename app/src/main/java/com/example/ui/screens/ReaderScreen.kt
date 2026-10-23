@@ -188,6 +188,8 @@ fun ReaderScreen(
         val textSizePx = with(density) { readerSettings.fontSizeSp.sp.toPx() }
         val paragraphSpacingPx = with(density) { readerSettings.paragraphSpacingDp.dp.toPx() }
 
+        val context = androidx.compose.ui.platform.LocalContext.current
+
         // Real text pagination calculated via Android's native StaticLayout
         val pages: List<BookPage> = remember(
             chapter.id,
@@ -197,7 +199,8 @@ fun ReaderScreen(
             textSizePx,
             readerSettings.lineHeightMultiplier,
             paragraphSpacingPx,
-            readerSettings.fontStyle
+            readerSettings.fontStyle,
+            context
         ) {
             TextPaginator.paginate(
                 text = chapter.content,
@@ -206,7 +209,8 @@ fun ReaderScreen(
                 textSizePx = textSizePx,
                 lineSpacingMultiplier = readerSettings.lineHeightMultiplier,
                 paragraphSpacingPx = paragraphSpacingPx,
-                fontStyle = readerSettings.fontStyle
+                fontStyle = readerSettings.fontStyle,
+                context = context
             )
         }
 

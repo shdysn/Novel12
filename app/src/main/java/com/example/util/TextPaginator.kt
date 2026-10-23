@@ -23,7 +23,8 @@ object TextPaginator {
         textSizePx: Float,
         lineSpacingMultiplier: Float,
         paragraphSpacingPx: Float,
-        fontStyle: FontStyleType
+        fontStyle: FontStyleType,
+        context: android.content.Context? = null
     ): List<BookPage> {
         val cleanText = text.trim()
         if (cleanText.isEmpty() || widthPx <= 80 || heightPx <= 80) {
@@ -40,11 +41,23 @@ object TextPaginator {
             )
         }
 
+        val fontResId = when (fontStyle) {
+            FontStyleType.NASTALEEQ -> com.example.R.font.noto_nastaliq_urdu
+            FontStyleType.MEHR_NASTALEEQ -> com.example.R.font.gulzar
+            FontStyleType.NASKH -> com.example.R.font.amiri
+        }
+
+        val loadedTypeface = try {
+            context?.let { androidx.core.content.res.ResourcesCompat.getFont(it, fontResId) }
+        } catch (e: Exception) {
+            null
+        } ?: Typeface.SERIF
+
         val textPaint = TextPaint().apply {
             isAntiAlias = true
             isSubpixelText = true
             textSize = textSizePx
-            typeface = if (fontStyle == FontStyleType.NASTALEEQ) Typeface.SERIF else Typeface.DEFAULT
+            typeface = loadedTypeface
         }
 
         // Split text by paragraphs while recording exact character offsets

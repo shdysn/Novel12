@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.Bookmark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.UrduFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +80,7 @@ fun BookmarkDialog(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "بک مارکس (Bookmarks)",
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp
                 )
@@ -101,7 +102,7 @@ fun BookmarkDialog(
                         text = {
                             Text(
                                 text = "نیا بک مارک",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal
                             )
@@ -113,7 +114,7 @@ fun BookmarkDialog(
                         text = {
                             Text(
                                 text = "محفوظ فہرست (${novelBookmarks.size})",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal
                             )
@@ -128,7 +129,7 @@ fun BookmarkDialog(
                     Column {
                         Text(
                             text = "$currentChapterTitle — صفحہ $currentPageNumber",
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = UrduFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             color = EmeraldPrimary
@@ -144,7 +145,7 @@ fun BookmarkDialog(
                         ) {
                             Text(
                                 text = "\"${currentSnippet.trim()}...\"",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 11.sp,
                                 maxLines = 3,
                                 overflow = TextOverflow.Ellipsis,
@@ -158,7 +159,7 @@ fun BookmarkDialog(
                         OutlinedTextField(
                             value = noteText,
                             onValueChange = { noteText = it },
-                            placeholder = { Text("اختیاری نوٹ شامل کریں (مثلاً اہم اقتباس)...", fontFamily = FontFamily.Serif, fontSize = 12.sp) },
+                            placeholder = { Text("اختیاری نوٹ شامل کریں (مثلاً اہم اقتباس)...", fontFamily = UrduFontFamily, fontSize = 12.sp) },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
                             maxLines = 3
@@ -175,7 +176,7 @@ fun BookmarkDialog(
                         ) {
                             Text(
                                 text = "اس ناول کے لیے کوئی بک مارک موجود نہیں",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -208,7 +209,7 @@ fun BookmarkDialog(
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(
                                                 text = "${bm.chapterTitle} — صفحہ ${bm.pageNumber}",
-                                                fontFamily = FontFamily.Serif,
+                                                fontFamily = UrduFontFamily,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 13.sp,
                                                 color = EmeraldPrimary
@@ -216,7 +217,7 @@ fun BookmarkDialog(
                                             if (bm.note.isNotBlank()) {
                                                 Text(
                                                     text = "نوٹ: ${bm.note}",
-                                                    fontFamily = FontFamily.Serif,
+                                                    fontFamily = UrduFontFamily,
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.SemiBold,
                                                     color = MaterialTheme.colorScheme.onSurface
@@ -224,7 +225,7 @@ fun BookmarkDialog(
                                             }
                                             Text(
                                                 text = bm.snippet,
-                                                fontFamily = FontFamily.Serif,
+                                                fontFamily = UrduFontFamily,
                                                 fontSize = 10.sp,
                                                 color = MaterialTheme.colorScheme.outline,
                                                 maxLines = 1,
@@ -262,17 +263,17 @@ fun BookmarkDialog(
                 ) {
                     Icon(imageVector = Icons.Default.BookmarkAdd, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("محفوظ کریں", fontFamily = FontFamily.Serif)
+                    Text("محفوظ کریں", fontFamily = UrduFontFamily)
                 }
             } else {
                 TextButton(onClick = onDismiss) {
-                    Text("بند کریں", fontFamily = FontFamily.Serif)
+                    Text("بند کریں", fontFamily = UrduFontFamily)
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("منسوخ", fontFamily = FontFamily.Serif)
+                Text("منسوخ", fontFamily = UrduFontFamily)
             }
         }
     )

@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
+import com.example.ui.theme.UrduFontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -127,7 +128,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         label = {
                             Text(
                                 text = "ہوم",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
@@ -153,7 +154,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         label = {
                             Text(
                                 text = "کیٹیگریز",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
@@ -179,7 +180,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         label = {
                             Text(
                                 text = "سرچ",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
@@ -205,7 +206,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         label = {
                             Text(
                                 text = "میری لائبریری",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
@@ -231,7 +232,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         label = {
                             Text(
                                 text = "پروفائل",
-                                fontFamily = FontFamily.Serif,
+                                fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
