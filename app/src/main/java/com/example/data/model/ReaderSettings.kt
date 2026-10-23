@@ -46,7 +46,7 @@ data class ReaderSettings(
     val paragraphSpacingDp: Int = 4,
     val horizontalMarginDp: Int = 12,
     val verticalMarginDp: Int = 8,
-    val alignment: TextAlignmentType = TextAlignmentType.JUSTIFIED,
+    val alignment: TextAlignmentType = TextAlignmentType.RIGHT_ALIGNED,
     val theme: ReaderTheme = ReaderTheme.WARM_PAPER,
     val fontStyle: FontStyleType = FontStyleType.PDMS_JAUHAR,
     val brightness: Float = 0.85f,

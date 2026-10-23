@@ -230,8 +230,12 @@ class NovelRepository(private val context: Context) {
         val paragraphSpacing = prefs.getInt("paragraph_spacing", 4)
         val horizMargin = prefs.getInt("horiz_margin", 12)
         val vertMargin = prefs.getInt("vert_margin", 8)
-        val alignmentName = prefs.getString("text_alignment", TextAlignmentType.JUSTIFIED.name) ?: TextAlignmentType.JUSTIFIED.name
-        val alignment = try { TextAlignmentType.valueOf(alignmentName) } catch (e: Exception) { TextAlignmentType.JUSTIFIED }
+        val savedAlignment = prefs.getString("text_alignment", null)
+        val alignment = if (savedAlignment == null || savedAlignment == "JUSTIFIED") {
+            TextAlignmentType.RIGHT_ALIGNED
+        } else {
+            try { TextAlignmentType.valueOf(savedAlignment) } catch (e: Exception) { TextAlignmentType.RIGHT_ALIGNED }
+        }
         val themeName = prefs.getString("reader_theme", ReaderTheme.WARM_PAPER.name) ?: ReaderTheme.WARM_PAPER.name
         val theme = try { ReaderTheme.valueOf(themeName) } catch (e: Exception) { ReaderTheme.WARM_PAPER }
         val fontStyleName = prefs.getString("font_style", FontStyleType.PDMS_JAUHAR.name) ?: FontStyleType.PDMS_JAUHAR.name

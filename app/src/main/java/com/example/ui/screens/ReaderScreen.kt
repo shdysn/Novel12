@@ -852,7 +852,7 @@ private fun SinglePageView(
     // Highlight search keyword if entered
     val annotatedText = remember(page.text, searchQuery, activeTheme) {
         buildAnnotatedString {
-            val text = page.text
+            val text = page.text.replace(Regex(" {2,}"), " ")
             if (searchQuery.isBlank()) {
                 append(text)
             } else {
@@ -1142,22 +1142,6 @@ private fun SinglePageView(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
-
-                        Button(
-                            onClick = onNextChapter,
-                            colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .testTag("end_of_chapter_next_button")
-                        ) {
-                            Text(
-                                text = "اگلا باب پڑھیں",
-                                fontFamily = fontFam,
-                                fontSize = 12.sp,
-                                color = Color.White
-                            )
-                        }
                     }
                 }
 

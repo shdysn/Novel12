@@ -26,7 +26,7 @@ object TextPaginator {
         fontStyle: FontStyleType,
         context: android.content.Context? = null
     ): List<BookPage> {
-        val cleanText = text.trim()
+        val cleanText = text.replace(Regex(" {2,}"), " ").trim()
         if (cleanText.isEmpty() || widthPx <= 80 || heightPx <= 80) {
             return listOf(
                 BookPage(
