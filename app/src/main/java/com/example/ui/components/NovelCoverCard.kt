@@ -118,7 +118,7 @@ fun NovelCoverCard(
                             textAlign = TextAlign.Center,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            lineHeight = 18.sp
+                            lineHeight = 15.6.sp
                         )
 
                         Text(
@@ -199,7 +199,7 @@ fun NovelCoverCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 18.sp
+                    lineHeight = 14.4.sp
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))

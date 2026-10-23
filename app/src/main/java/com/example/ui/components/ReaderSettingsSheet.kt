@@ -409,14 +409,14 @@ fun ReaderSettingsSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 5. Line Spacing Multiplier (Fixed 1.6x)
+            // 5. Line Spacing Multiplier (Fixed 1.2x)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "سطروں کا فاصلہ (Line Spacing): 1.6x (مقررہ)",
+                    text = "سطروں کا فاصلہ (Line Spacing): 1.2x (مقررہ)",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
@@ -426,7 +426,7 @@ fun ReaderSettingsSheet(
                     color = EmeraldPrimary.copy(alpha = 0.12f)
                 ) {
                     Text(
-                        text = "1.6x",
+                        text = "1.2x",
                         fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
                         color = EmeraldPrimary,

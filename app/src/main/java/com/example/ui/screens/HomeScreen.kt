@@ -575,7 +575,7 @@ private fun FeaturedNovelHero(
                         color = Color.White.copy(alpha = 0.75f),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 16.sp
+                        lineHeight = 13.2.sp
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))

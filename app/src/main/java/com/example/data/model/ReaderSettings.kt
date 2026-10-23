@@ -42,7 +42,7 @@ enum class TextAlignmentType(val urduLabel: String) {
 
 data class ReaderSettings(
     val fontSizeSp: Float = 22f,
-    val lineHeightMultiplier: Float = 1.6f,
+    val lineHeightMultiplier: Float = 1.2f,
     val paragraphSpacingDp: Int = 4,
     val horizontalMarginDp: Int = 12,
     val verticalMarginDp: Int = 8,

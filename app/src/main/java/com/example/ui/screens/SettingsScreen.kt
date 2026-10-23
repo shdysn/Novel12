@@ -128,7 +128,7 @@ fun SettingsScreen(
                         fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 20.sp
+                        lineHeight = 15.6.sp
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -226,7 +226,7 @@ fun SettingsScreen(
                         text = "اردو ناولز ریڈر اینڈ پبلشر - ورژن 1.0\nمستند اردو لٹریچر، پیرِ کامل، راجہ گدھ، امراؤ جان ادا اور جدید ناولز کا ڈیجیٹل کتب خانہ۔",
                         fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
-                        lineHeight = 22.sp,
+                        lineHeight = 15.6.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -252,7 +252,7 @@ private fun UnicodeAdvantageItem(text: String) {
             fontFamily = UrduFontFamily,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            lineHeight = 18.sp
+            lineHeight = 14.4.sp
         )
     }
 }

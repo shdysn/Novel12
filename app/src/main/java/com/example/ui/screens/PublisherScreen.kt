@@ -625,7 +625,7 @@ fun PublisherScreen(
                     text = "کیا آپ واقعی ناول \"${deletingNovel!!.title}\" اور اس کے تمام ابواب کو لوکل ڈیٹابیس اور کلاؤڈ سے مستقل طور پر حذف کرنا چاہتے ہیں؟",
                     fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
-                    lineHeight = 20.sp
+                    lineHeight = 15.6.sp
                 )
             },
             confirmButton = {

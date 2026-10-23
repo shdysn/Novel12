@@ -674,7 +674,7 @@ fun ProfileScreen(
                             text = "✦ \"کتابیں انسان کی بہترین اور وفادار ترین دوست ہیں۔\" — مطالعہ کا روزانہ ایک گھنٹہ آپ کی فکر کو نئی وسعتیں بخشتا ہے۔",
                             fontFamily = UrduFontFamily,
                             fontSize = 11.sp,
-                            lineHeight = 18.sp,
+                            lineHeight = 13.2.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(10.dp)
                         )
@@ -1049,7 +1049,7 @@ fun ProfileScreen(
                     text = "کیا آپ واقعی تمام ناولز کی ریڈنگ پروگریس، بک مارکس اور سرچ ہسٹری ری سیٹ کرنا چاہتے ہیں؟ یہ عمل واپس نہیں کیا جا سکے گا۔",
                     fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
-                    lineHeight = 22.sp
+                    lineHeight = 15.6.sp
                 )
             },
             confirmButton = {
@@ -1241,14 +1241,14 @@ fun ProfileScreen(
                         text = "داستانِ نو اردو زبان اور کلاسیک لٹریچر کو جدید ترین ڈیجیٹل تقاضوں سے ہم آہنگ کرنے والا ایک پروقار پلیٹ فارم ہے۔",
                         fontFamily = UrduFontFamily,
                         fontSize = 13.sp,
-                        lineHeight = 22.sp
+                        lineHeight = 15.6.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "خصوصیات:\n• 100٪ خالص یونیکوڈ متن (تصاویر کے بجائے اصلی ٹیکسٹ)\n• پیج بائی پیج بک ریڈنگ انجن\n• جمیل نوری و مہر نستعلیق فونٹس\n• مکمل آف لائن سپورٹ بغیر انٹرنیٹ",
                         fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
-                        lineHeight = 20.sp,
+                        lineHeight = 14.4.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -1285,7 +1285,7 @@ fun ProfileScreen(
                     text = "آپ کا مطالعہ کا ریکارڈ، بک مارکس اور ترجیحات مکمل طور پر آپ کے ڈیوائس پر نجی اور محفوظ ہیں۔ ایپ کوئی غیر ضروری معلومات جمع نہیں کرتی۔ جب آپ خود Supabase کلاؤڈ سنک فعال کرتے ہیں تو صرف کتابیں اور پبلش کردہ ابواب کلاؤڈ پر ہم آہنگ ہوتے ہیں۔",
                     fontFamily = UrduFontFamily,
                     fontSize = 13.sp,
-                    lineHeight = 22.sp
+                    lineHeight = 15.6.sp
                 )
             },
             confirmButton = {

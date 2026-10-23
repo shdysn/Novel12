@@ -416,7 +416,7 @@ private fun FeaturedHeroBanner(
                     color = Color.White.copy(alpha = 0.75f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 18.sp
+                    lineHeight = 14.4.sp
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))

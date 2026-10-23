@@ -213,7 +213,7 @@ fun NovelDetailScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 17.sp,
                                 textAlign = TextAlign.Center,
-                                lineHeight = 24.sp
+                                lineHeight = 20.4.sp
                             )
 
                             Text(
@@ -582,7 +582,7 @@ fun NovelDetailScreen(
                         text = novel.synopsis,
                         fontFamily = UrduFontFamily,
                         fontSize = 14.sp,
-                        lineHeight = 24.sp,
+                        lineHeight = 16.8.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(14.dp)
                     )
@@ -644,7 +644,7 @@ fun NovelDetailScreen(
                                 fontFamily = UrduFontFamily,
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.outline,
-                                lineHeight = 18.sp
+                                lineHeight = 14.4.sp
                             )
                         }
                     }

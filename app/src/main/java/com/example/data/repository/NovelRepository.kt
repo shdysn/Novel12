@@ -226,7 +226,7 @@ class NovelRepository(private val context: Context) {
 
     private fun loadSettings() {
         val fontSize = prefs.getFloat("font_size", 22f)
-        val lineSpacing = prefs.getFloat("line_spacing", 1.65f)
+        val lineSpacing = prefs.getFloat("line_spacing", 1.2f)
         val paragraphSpacing = prefs.getInt("paragraph_spacing", 4)
         val horizMargin = prefs.getInt("horiz_margin", 12)
         val vertMargin = prefs.getInt("vert_margin", 8)

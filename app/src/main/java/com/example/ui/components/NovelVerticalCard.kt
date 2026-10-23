@@ -118,7 +118,7 @@ fun NovelVerticalCard(
                             textAlign = TextAlign.Center,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            lineHeight = 20.sp
+                            lineHeight = 16.8.sp
                         )
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
