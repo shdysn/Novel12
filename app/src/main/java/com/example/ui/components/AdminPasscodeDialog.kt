@@ -115,8 +115,18 @@ fun AdminPasscodeDialog(
                         color = MaterialTheme.colorScheme.error,
                         fontFamily = UrduFontFamily,
                         fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 6.dp)
                     )
+                }
+
+                TextButton(
+                    onClick = {
+                        errorMessage = "📩 ایڈمن ای میل shahidsaaqib@gmail.com رجسٹرڈ ہے۔ ڈیفالٹ ماسٹر پن 8888 ہے۔"
+                    },
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text("پاس کوڈ بھول گئے؟ (Forgot PIN)", fontFamily = UrduFontFamily, fontSize = 11.sp, color = EmeraldPrimary)
                 }
             }
         },
@@ -126,7 +136,7 @@ fun AdminPasscodeDialog(
                     if (inputPin.trim() == "8888" || inputPin.trim() == "1234") {
                         onSuccess()
                     } else {
-                        errorMessage = "غلط پاس کوڈ! درست پاس کوڈ درج کریں (ڈیفالٹ: 8888)"
+                        errorMessage = "غلط پاس کوڈ! ایڈمن ای میل shahidsaaqib@gmail.com پر رجسٹرڈ پاس کوڈ درج کریں۔"
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),

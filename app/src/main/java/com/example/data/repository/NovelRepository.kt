@@ -113,14 +113,14 @@ class NovelRepository(private val context: Context) {
     val wifiOnlyDownload = MutableStateFlow(prefs.getBoolean("pref_wifi", true))
     val userName = MutableStateFlow(prefs.getString("user_name", "شاہد ثاقب") ?: "شاہد ثاقب")
     val userTitle = MutableStateFlow(prefs.getString("user_title", "عاشقِ اردو ادب") ?: "عاشقِ اردو ادب")
-    val userEmail = MutableStateFlow(prefs.getString("user_email", "shahid.saaqib@gmail.com") ?: "shahid.saaqib@gmail.com")
+    val userEmail = MutableStateFlow(prefs.getString("user_email", "shahidsaaqib@gmail.com") ?: "shahidsaaqib@gmail.com")
     val dailyGoalMinutes = MutableStateFlow(prefs.getInt("daily_goal_minutes", 30))
     val isVipMember = MutableStateFlow(prefs.getBoolean("is_vip_member", true))
 
     fun updateProfile(name: String, title: String, email: String) {
         userName.value = name.trim().ifEmpty { "شاہد ثاقب" }
         userTitle.value = title.trim().ifEmpty { "عاشقِ اردو ادب" }
-        userEmail.value = email.trim().ifEmpty { "shahid.saaqib@gmail.com" }
+        userEmail.value = email.trim().ifEmpty { "shahidsaaqib@gmail.com" }
         prefs.edit()
             .putString("user_name", userName.value)
             .putString("user_title", userTitle.value)
