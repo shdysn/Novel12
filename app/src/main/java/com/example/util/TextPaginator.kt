@@ -131,16 +131,11 @@ object TextPaginator {
                 val lineEnd = layout.getLineEnd(line)
                 val lineText = p.text.substring(lineStart, lineEnd)
 
-                // Effective line height rendered by Jetpack Compose Text(lineHeight = textSize * multiplier)
-                val effectiveComposeLineHeight = textSizePx * lineSpacingMultiplier
-                val lineActualHeight = maxOf(effectiveComposeLineHeight, (layout.getLineBottom(line) - layout.getLineTop(line)).toFloat())
+                // Exact line height matching Jetpack Compose Text(lineHeight = textSize * multiplier)
+                val lineActualHeight = textSizePx * lineSpacingMultiplier
 
-                // Page 1 leaves room for the chapter cartouche, while standard pages use the full page body
-                val maxAllowedHeight = if (pages.isEmpty()) {
-                    (heightPx - (textSizePx * 2.8f)).coerceAtLeast(120f)
-                } else {
-                    heightPx.toFloat()
-                }
+                // Page text body height
+                val maxAllowedHeight = heightPx.toFloat()
 
                 // Check if adding this line exceeds available page height
                 if (currentHeight + lineActualHeight > maxAllowedHeight && currentPageBuffer.isNotEmpty()) {
@@ -157,10 +152,9 @@ object TextPaginator {
                 currentHeight += lineActualHeight
             }
 
-            // In printed novels, consecutive paragraphs follow on the next line with paragraph spacing
+            // Paragraph ends with a clean newline for the next paragraph
             if (currentPageBuffer.isNotEmpty() && !currentPageBuffer.endsWith("\n")) {
                 currentPageBuffer.append("\n")
-                currentHeight += paragraphSpacingPx
             }
         }
 

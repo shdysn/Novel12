@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -189,9 +192,11 @@ fun ReaderScreen(
         val textWidthDp = (screenWidthDp - (sheetHorizPadding * 2) - (readerSettings.horizontalMarginDp * 2).dp - extraHorizPadDp).coerceAtLeast(100.dp)
 
         // Exact vertical overhead calculation:
-        // System bars (~44dp) + Sheet padding (8dp) + Page column padding (extraVertPadDp + verticalMargin*2) + Header (24dp) + Footer (22dp) + Spacers (8dp)
-        val extraVertPadDp = if (readerSettings.showBookFrame) 12.dp else 4.dp
-        val bookOverheadDp = 44.dp + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 54.dp
+        // System insets + Sheet padding (8dp) + Page column padding (extraVertPadDp + verticalMargin*2) + Header/Footer (~48dp)
+        val insets = WindowInsets.systemBars.asPaddingValues()
+        val sysBarsHeight = insets.calculateTopPadding() + insets.calculateBottomPadding()
+        val extraVertPadDp = if (readerSettings.showBookFrame) 10.dp else 4.dp
+        val bookOverheadDp = sysBarsHeight + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 48.dp
         val textHeightDp = (screenHeightDp - bookOverheadDp).coerceAtLeast(150.dp)
 
         val widthPx = with(density) { textWidthDp.roundToPx() }
@@ -1074,63 +1079,27 @@ private fun SinglePageView(
 
                     Spacer(modifier = Modifier.height(6.dp))
                 } else {
-                    // CHAPTER OPENING PAGE UNWAN (عنوانِ لوح)
-                    Column(
+                    // COMPACT CHAPTER HEADER (مختصر باب کا عنوان — بغیر اضافی جگہ اور بسم اللہ کے)
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 2.dp, bottom = 6.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(top = 2.dp, bottom = 4.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Bismillah calligraphy
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text("❧ ", color = GoldAccent, fontSize = 12.sp)
-                            Text(
-                                text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                                fontFamily = fontFam,
-                                fontSize = (readerSettings.fontSizeSp * 0.85f).sp,
-                                color = activeTheme.textColor.copy(alpha = 0.9f),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(" ☙", color = GoldAccent, fontSize = 12.sp)
-                        }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        // Chapter Heading Box
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = activeTheme.textColor.copy(alpha = 0.04f),
-                            border = BorderStroke(0.8.dp, GoldAccent.copy(alpha = 0.6f)),
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "— ❖ $chapterTitle ❖ —",
-                                    fontFamily = fontFam,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = (readerSettings.fontSizeSp * 0.95f).sp,
-                                    color = EmeraldPrimary,
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "« باب نمبر $chapterNumberDisplay از $totalChaptersDisplay »",
-                                    fontFamily = fontFam,
-                                    fontSize = 11.sp,
-                                    color = activeTheme.textColor.copy(alpha = 0.65f),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(top = 2.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("— ❖ ", color = GoldAccent, fontSize = 11.sp)
+                        Text(
+                            text = chapterTitle,
+                            fontFamily = fontFam,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = EmeraldPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(" ❖ —", color = GoldAccent, fontSize = 11.sp)
                     }
+
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 // --- PAGE BODY TEXT ---
