@@ -1,0 +1,6 @@
+{
+  "name": "Urdu Novels Reader",
+  "description": "اردو ناولز ریڈر - Read, explore, and publish Urdu novels with Unicode text and Supabase cloud sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

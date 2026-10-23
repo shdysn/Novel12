@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Star/Quill flourish above book -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M54,23 L56,29 L62,29 L57,33 L59,39 L54,35 L49,39 L51,33 L46,29 L52,29 Z" />
+
+    <!-- Open book spine/cover back shadow -->
+    <path
+        android:fillColor="#0D1F18"
+        android:pathData="M25,71 C38,68 48,72 54,74 C60,72 70,68 83,71 L83,74 C70,71 60,75 54,77 C48,75 38,71 25,74 Z" />
+
+    <!-- Left Page Base (Parchment white) -->
+    <path
+        android:fillColor="#FFF8E7"
+        android:pathData="M53,42 C45,39 36,40 26,44 C25.4,44.3 25,44.9 25,45.5 L25,69.5 C25,70.5 26.2,71.2 27.1,70.8 C36,67 45,68 53,71 Z" />
+
+    <!-- Right Page Base (Parchment warm) -->
+    <path
+        android:fillColor="#FFF3D4"
+        android:pathData="M55,42 C63,39 72,40 82,44 C82.6,44.3 83,44.9 83,45.5 L83,69.5 C83,70.5 81.8,71.2 80.9,70.8 C72,67 63,68 55,71 Z" />
+
+    <!-- Left page text lines (Urdu script lines simulation) -->
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M31,49 C37,47 43,47.5 48,49 L48,50.5 C43,49 37,48.5 31,50.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M30,53 C36,51 43,51.5 49,53 L49,54.5 C43,53 36,52.5 30,54.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M32,57 C38,55 43,55.5 48,57 L48,58.5 C43,57 38,56.5 32,58.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M33,61 C37,60 42,60.5 47,62 L47,63.5 C42,62 37,61.5 33,63.5 Z" />
+
+    <!-- Right page text lines -->
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M60,49 C65,47.5 71,47 77,49 L77,50.5 C71,48.5 65,49 60,50.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M59,53 C65,51.5 72,51 78,53 L78,54.5 C72,52.5 65,53 59,54.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M60,57 C65,55.5 70,55 76,57 L76,58.5 C70,56.5 65,57 60,58.5 Z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M61,61 C66,60.5 71,60 75,61.5 L75,63 C71,61.5 66,62 61,63 Z" />
+
+    <!-- Center spine seam -->
+    <path
+        android:fillColor="#E0C9A6"
+        android:pathData="M53.5,41.5 L54.5,41.5 L54.5,72 L53.5,72 Z" />
+
+    <!-- Elegant Golden Bookmark Ribbon hanging down center -->
+    <path
+        android:fillColor="#E5A93B"
+        android:pathData="M52,41 L56,41 L56,76 L54,73 L52,76 Z" />
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M52.5,41 L54.5,41 L54.5,73.5 L52.5,75 Z" />
+</vector>

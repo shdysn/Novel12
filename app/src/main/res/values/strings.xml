@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">اردو ناولز</string>
+    <string name="tab_home">ہوم</string>
+    <string name="tab_categories">کیٹیگریز</string>
+    <string name="tab_search">سرچ</string>
+    <string name="tab_library">میری لائبریری</string>
+    <string name="tab_profile">پروفائل</string>
+</resources>
