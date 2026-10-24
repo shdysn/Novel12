@@ -62,6 +62,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import android.content.Intent
 import android.net.Uri
 import com.example.data.model.Novel
+import com.example.ui.components.AuthorSelector
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
@@ -111,6 +112,15 @@ fun SettingsScreen(
     val userEmail by viewModel.userEmail.collectAsState()
     val dailyGoalMinutes by viewModel.dailyGoalMinutes.collectAsState()
     val novels by viewModel.novels.collectAsState()
+    val authorsList by viewModel.authors.collectAsState()
+
+    val existingAuthorNames = remember(authorsList, novels) {
+        (authorsList.map { it.name } + novels.map { it.author })
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+    }
 
     var showSupabaseSheet by remember { mutableStateOf(false) }
     var showFullPublisherSheet by remember { mutableStateOf(false) }
@@ -773,7 +783,7 @@ fun SettingsScreen(
     // -----------------------------------------------------------------
     if (showNewNovelUploadDialog) {
         var novelTitle by remember { mutableStateOf("") }
-        var novelAuthor by remember { mutableStateOf(userName) }
+        var novelAuthor by remember { mutableStateOf(existingAuthorNames.firstOrNull() ?: userName) }
         var novelCategory by remember { mutableStateOf("رومانوی") }
         var novelSynopsis by remember { mutableStateOf("") }
         var initialChapTitle by remember { mutableStateOf("باب اول") }
@@ -824,18 +834,11 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    OutlinedTextField(
-                        value = novelAuthor,
-                        onValueChange = { novelAuthor = it },
-                        label = { Text("مصنف کا نام *", fontFamily = UrduFontFamily, color = TextMutedPurple) },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GoldAccent,
-                            unfocusedBorderColor = Color(0xFF382F58),
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+                    AuthorSelector(
+                        selectedAuthor = novelAuthor,
+                        onAuthorSelected = { novelAuthor = it },
+                        existingAuthors = existingAuthorNames,
+                        label = "مصنف کا نام *"
                     )
 
                     OutlinedTextField(

@@ -84,6 +84,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.Novel
 import com.example.data.model.NovelCategory
 import com.example.data.supabase.TypeScriptGuide
+import com.example.ui.components.AuthorSelector
 import com.example.ui.theme.EmeraldDark
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
@@ -101,7 +102,15 @@ fun PublisherScreen(
     val supabaseConfig by viewModel.supabaseConfig.collectAsState()
     val isSyncing by viewModel.isSyncing.collectAsState()
     val allNovels by viewModel.allNovels.collectAsState()
-    val authors by viewModel.authors.collectAsState()
+    val authorsList by viewModel.authors.collectAsState()
+
+    val existingAuthorNames = remember(authorsList, allNovels) {
+        (authorsList.map { it.name } + allNovels.map { it.author })
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+    }
 
     var showConfigDialog by remember { mutableStateOf(false) }
     var showCreateNovelDialog by remember { mutableStateOf(false) }
@@ -559,6 +568,7 @@ fun PublisherScreen(
     // Create New Novel Dialog
     if (showCreateNovelDialog) {
         CreateNovelDialog(
+            existingAuthors = existingAuthorNames,
             onDismiss = { showCreateNovelDialog = false },
             onPublish = { title, author, category, synopsis, chTitle, chContent, publicationStatus, coverUrl ->
                 viewModel.publishNewNovel(
@@ -580,6 +590,7 @@ fun PublisherScreen(
     if (editingNovel != null) {
         EditNovelDialog(
             novel = editingNovel!!,
+            existingAuthors = existingAuthorNames,
             onDismiss = { editingNovel = null },
             onSave = { novelId, title, author, category, synopsis, publicationStatus, coverUrl ->
                 viewModel.updateNovelMetadata(
@@ -683,11 +694,12 @@ fun PublisherScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateNovelDialog(
+    existingAuthors: List<String>,
     onDismiss: () -> Unit,
     onPublish: (String, String, String, String, String, String, String, String?) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
-    var author by remember { mutableStateOf("") }
+    var author by remember { mutableStateOf(existingAuthors.firstOrNull() ?: "") }
     var category by remember { mutableStateOf("سماجی و اصلاحی") }
     var synopsis by remember { mutableStateOf("") }
     var chTitle by remember { mutableStateOf("باب اول") }
@@ -739,12 +751,10 @@ private fun CreateNovelDialog(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = author,
-                    onValueChange = { author = it },
-                    label = { Text("مصنف کا نام *", fontFamily = UrduFontFamily) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                AuthorSelector(
+                    selectedAuthor = author,
+                    onAuthorSelected = { author = it },
+                    existingAuthors = existingAuthors
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -830,6 +840,7 @@ private fun CreateNovelDialog(
 @Composable
 private fun EditNovelDialog(
     novel: Novel,
+    existingAuthors: List<String>,
     onDismiss: () -> Unit,
     onSave: (String, String, String, String, String, String, String?) -> Unit
 ) {
@@ -881,11 +892,10 @@ private fun EditNovelDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = author,
-                    onValueChange = { author = it },
-                    label = { Text("مصنف", fontFamily = UrduFontFamily) },
-                    modifier = Modifier.fillMaxWidth()
+                AuthorSelector(
+                    selectedAuthor = author,
+                    onAuthorSelected = { author = it },
+                    existingAuthors = existingAuthors
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
