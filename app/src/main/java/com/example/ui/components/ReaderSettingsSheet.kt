@@ -199,7 +199,7 @@ fun ReaderSettingsSheet(
 
             // 1. Reading Themes (4 Core Themes)
             Text(
-                text = "مطالعہ کے پس منظر (Reading Themes)",
+                text = "مطالعہ کے پس منظر",
                 fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
@@ -385,7 +385,7 @@ fun ReaderSettingsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "متن کی سیدھ (Alignment)",
+                    text = "متن کی سیدھ",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
@@ -396,7 +396,7 @@ fun ReaderSettingsSheet(
                         selected = settings.alignment == TextAlignmentType.JUSTIFIED,
                         onClick = { onSettingsChanged(settings.copy(alignment = TextAlignmentType.JUSTIFIED)) },
                         leadingIcon = { Icon(Icons.Default.FormatAlignJustify, contentDescription = null, modifier = Modifier.size(14.dp)) },
-                        label = { Text("برابر (Justified)", fontFamily = UrduFontFamily, fontSize = 12.sp) }
+                        label = { Text("برابر", fontFamily = UrduFontFamily, fontSize = 12.sp) }
                     )
                     FilterChip(
                         selected = settings.alignment == TextAlignmentType.RIGHT_ALIGNED,
@@ -416,7 +416,7 @@ fun ReaderSettingsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "سطروں کا فاصلہ (Line Spacing): 1.2x (مقررہ)",
+                    text = "سطروں کا فاصلہ: 1.2x (معیاری)",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp

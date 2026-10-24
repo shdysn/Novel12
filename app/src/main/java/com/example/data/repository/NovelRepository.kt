@@ -333,7 +333,7 @@ class NovelRepository(private val context: Context) {
     }
 
     fun getChapters(novelId: String): List<Chapter> {
-        val roomChaps = cachedRoomChaptersMap[novelId]
+        val roomChaps = cachedRoomChaptersMap[novelId]?.filter { it.content.isNotBlank() }
         if (!roomChaps.isNullOrEmpty()) {
             return roomChaps.sortedBy { it.chapterNumber }
         }
@@ -343,7 +343,7 @@ class NovelRepository(private val context: Context) {
     }
 
     suspend fun getChaptersAsync(novelId: String): List<Chapter> = withContext(Dispatchers.IO) {
-        val entities = chapterDao.getChaptersForNovel(novelId)
+        val entities = chapterDao.getChaptersForNovel(novelId).filter { it.content.isNotBlank() }
         if (entities.isNotEmpty()) {
             return@withContext entities.map { it.toDomainModel() }
         }
@@ -524,11 +524,11 @@ class NovelRepository(private val context: Context) {
                     }
                 }
 
-                // If not from cloud, use local chapters from Room or Sample list
+                // If not from cloud, use local chapters from Room (if valid content) or Sample list
                 if (fetchedChapters.isEmpty()) {
-                    val existing = chapterDao.getChaptersForNovel(novelId)
-                    if (existing.isNotEmpty()) {
-                        fetchedChapters = existing.map { it.toDomainModel() }
+                    val existingValid = chapterDao.getChaptersForNovel(novelId).filter { it.content.isNotBlank() }
+                    if (existingValid.isNotEmpty()) {
+                        fetchedChapters = existingValid.map { it.toDomainModel() }
                     } else {
                         fetchedChapters = SampleUrduNovels.chaptersMap[novelId] ?: emptyList()
                     }
@@ -583,8 +583,10 @@ class NovelRepository(private val context: Context) {
     suspend fun deleteDownloadedNovel(novelId: String): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val novel = getNovelById(novelId) ?: return@withContext Pair(false, "ناول نہیں ملا")
         try {
-            // Free storage by clearing chapter contents, but keep novel metadata and reading position
-            chapterDao.clearChapterContentForNovel(novelId)
+            // Delete chapters from Room and clear in-memory cache so re-downloading gets fresh full chapter content
+            chapterDao.deleteChaptersForNovel(novelId)
+            cachedRoomChaptersMap.remove(novelId)
+            inMemoryCustomChapters.remove(novelId)
             updateNovelDownloadStatus(novelId, DownloadStatus.NOT_DOWNLOADED)
             Pair(true, "ناول \"${novel.title}\" کا آف لائن کیشے کامیابی سے خارج کر دیا گیا")
         } catch (e: Exception) {

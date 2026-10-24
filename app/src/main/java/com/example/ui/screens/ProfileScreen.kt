@@ -688,7 +688,7 @@ fun ProfileScreen(
         // -------------------------------------------------------------
         item {
             ProfileSectionHeader(
-                title = "قراءت و فونٹ کی ترتیبات (Reading Settings)",
+                title = "قراءت و فونٹ کی ترتیبات",
                 subtitle = "رسم الخط، فونٹ سائز اور تھیم کی ذاتی ترجیحات"
             )
         }
@@ -704,9 +704,9 @@ fun ProfileScreen(
                 Column {
                     ProfileMenuRow(
                         icon = Icons.Default.FontDownload,
-                        title = "اردو رسم الخط (Nastaliq Calligraphy)",
+                        title = "اردو رسم الخط",
                         subtitle = when (readerSettings.fontStyle) {
-                            FontStyleType.PDMS_JAUHAR -> "پی ڈی ایم ایس جوہر (PDMS Johur Nastaliq — اصل خطاطی)"
+                            FontStyleType.PDMS_JAUHAR -> "پی ڈی ایم ایس جوہر (اصل خطاطی)"
                             FontStyleType.NASTALEEQ -> "نوری نستعلیق (خالص اردو خطاطی)"
                             FontStyleType.MEHR_NASTALEEQ -> "مہر نستعلیق (جدید خطاطی)"
                             FontStyleType.LATEEF -> "خطِ لطیف (روایتی کتابی خط)"

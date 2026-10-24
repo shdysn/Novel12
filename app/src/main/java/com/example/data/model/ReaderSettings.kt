@@ -18,21 +18,21 @@ enum class ReaderTheme(
     val textColor: Color,
     val deskColor: Color
 ) {
-    PURE_WHITE("خالص سفید (Pure White)", Color(0xFFFFFFFF), Color(0xFF000000), Color(0xFFFFFFFF)),
-    WARM_PAPER("کاغذی (Warm Paper)", ReaderPaperBg, ReaderPaperText, Color(0xFFE8DFC9)),
-    SEPIA("سیپیا (Sepia)", ReaderSepiaBg, ReaderSepiaText, Color(0xFFD6C5A2)),
-    DARK_MODE("نائٹ موڈ (Dark Mode)", ReaderNightBg, ReaderNightText, Color(0xFF0F1215)),
-    OLED("گہرا سیاہ (OLED)", ReaderOledBg, ReaderOledText, Color(0xFF080808)),
-    EMERALD("زمردی (Emerald)", ReaderEmeraldBg, ReaderEmeraldText, Color(0xFF06140D))
+    PURE_WHITE("خالص سفید", Color(0xFFFFFFFF), Color(0xFF000000), Color(0xFFFFFFFF)),
+    WARM_PAPER("کاغذی (کلاسک)", ReaderPaperBg, ReaderPaperText, Color(0xFFE8DFC9)),
+    SEPIA("سیپیا", ReaderSepiaBg, ReaderSepiaText, Color(0xFFD6C5A2)),
+    DARK_MODE("نائٹ موڈ", ReaderNightBg, ReaderNightText, Color(0xFF0F1215)),
+    OLED("گہرا سیاہ", ReaderOledBg, ReaderOledText, Color(0xFF080808)),
+    EMERALD("زمردی", ReaderEmeraldBg, ReaderEmeraldText, Color(0xFF06140D))
 }
 
 enum class FontStyleType(val urduLabel: String) {
-    PDMS_JAUHAR("پی ڈی ایم ایس جوہر (PDMS Johur Nastaliq — معیاری)"),
-    NASTALEEQ("نوری نستعلیق (Jameel / Noto)"),
-    MEHR_NASTALEEQ("مہر نستعلیق (Mehr / Gulzar)"),
-    NASKH("جدید نسخ (Amiri Naskh)"),
-    LATEEF("خطِ لطیف (Lateef)"),
-    SCHEHERAZADE("خطِ شہزاد (Scheherazade / روایتی نسخ)")
+    PDMS_JAUHAR("پی ڈی ایم ایس جوہر (معیاری)"),
+    NASTALEEQ("نوری نستعلیق"),
+    MEHR_NASTALEEQ("مہر نستعلیق"),
+    NASKH("جدید نسخ"),
+    LATEEF("خطِ لطیف"),
+    SCHEHERAZADE("خطِ شہزاد")
 }
 
 enum class TextAlignmentType(val urduLabel: String) {
