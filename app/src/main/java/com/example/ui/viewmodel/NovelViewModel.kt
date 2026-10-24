@@ -409,4 +409,11 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
             onSuccess(chapter)
         }
     }
+
+    fun restoreSampleData() {
+        viewModelScope.launch {
+            val (success, msg) = repository.restoreDefaultSampleData()
+            showMessage(msg)
+        }
+    }
 }

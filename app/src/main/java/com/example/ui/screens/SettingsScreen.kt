@@ -200,6 +200,41 @@ fun SettingsScreen(
             }
         }
 
+        // Section: Data & Cache Restore
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "ڈیٹا اور ناولز ری سیٹ (Restore Sample Data)",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "اگر آپ نے غلطی سے ناولز یا ان کے ابواب حذف کر دیے ہیں اور بنیادی نمونہ ناولز (پیر کامل، راجہ گدھ، وغیرہ) دوبارہ حاصل کرنا چاہتے ہیں تو نیچے کلک کریں۔",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = { viewModel.restoreSampleData() },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth().testTag("restore_sample_novels_button")
+                    ) {
+                        Text("بنیادی نمونہ ناولز بحال کریں", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+
         // Section: About App
         item {
             Card(

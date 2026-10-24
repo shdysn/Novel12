@@ -146,7 +146,26 @@ class NovelRepository(private val context: Context) {
         }
     }
 
+    private fun getDeletedNovelIds(): Set<String> {
+        return prefs.getStringSet("deleted_novel_ids", emptySet()) ?: emptySet()
+    }
+
+    private fun markNovelAsDeleted(novelId: String) {
+        val current = getDeletedNovelIds().toMutableSet()
+        current.add(novelId)
+        prefs.edit().putStringSet("deleted_novel_ids", current).apply()
+    }
+
+    private fun unmarkNovelAsDeleted(novelId: String) {
+        val current = getDeletedNovelIds().toMutableSet()
+        current.remove(novelId)
+        prefs.edit().putStringSet("deleted_novel_ids", current).apply()
+    }
+
     private suspend fun seedDatabaseIfEmpty() {
+        val hasSeeded = prefs.getBoolean("has_seeded_database", false)
+        if (hasSeeded) return
+
         val existingNovels = novelDao.getAllNovelsFlow().first()
         if (existingNovels.isEmpty()) {
             val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date())
@@ -185,6 +204,7 @@ class NovelRepository(private val context: Context) {
                 }
             }
             chapterDao.insertChapters(chapterEntities)
+            prefs.edit().putBoolean("has_seeded_database", true).apply()
         }
     }
 
@@ -194,16 +214,22 @@ class NovelRepository(private val context: Context) {
     private fun observeRoomDatabase() {
         repositoryScope.launch {
             novelDao.getAllNovelsFlow().collect { entities ->
-                _novels.value = entities.map { it.toDomainModel() }
+                val deletedIds = getDeletedNovelIds()
+                val activeEntities = entities.filterNot { deletedIds.contains(it.id) }
+                _novels.value = activeEntities.map { it.toDomainModel() }
                 // Update download status map
-                val statusMap = entities.associate { it.id to DownloadStatus.fromString(it.downloadStatus) }
+                val statusMap = activeEntities.associate { it.id to DownloadStatus.fromString(it.downloadStatus) }
                 _downloadStatuses.value = statusMap
             }
         }
 
         repositoryScope.launch {
             chapterDao.getAllChaptersFlow().collect { entities ->
-                val grouped = entities.map { it.toDomainModel() }.groupBy { it.novelId }
+                val deletedIds = getDeletedNovelIds()
+                val grouped = entities
+                    .filterNot { deletedIds.contains(it.novelId) }
+                    .map { it.toDomainModel() }
+                    .groupBy { it.novelId }
                 cachedRoomChaptersMap.clear()
                 cachedRoomChaptersMap.putAll(grouped)
             }
@@ -219,7 +245,8 @@ class NovelRepository(private val context: Context) {
 
         repositoryScope.launch {
             bookmarkDao.getAllBookmarksFlow().collect { entities ->
-                _bookmarks.value = entities.map { it.toDomainModel() }
+                val deletedIds = getDeletedNovelIds()
+                _bookmarks.value = entities.map { it.toDomainModel() }.filterNot { deletedIds.contains(it.novelId) }
             }
         }
     }
@@ -322,33 +349,60 @@ class NovelRepository(private val context: Context) {
     }
 
     fun getNovelById(id: String): Novel? {
+        if (getDeletedNovelIds().contains(id)) return null
         return _novels.value.firstOrNull { it.id == id }
-            ?: SampleUrduNovels.novelsList.firstOrNull { it.id == id }
+            ?: SampleUrduNovels.novelsList.firstOrNull { it.id == id && !getDeletedNovelIds().contains(id) }
     }
 
     suspend fun getNovelByIdAsync(id: String): Novel? = withContext(Dispatchers.IO) {
+        if (getDeletedNovelIds().contains(id)) return@withContext null
         _novels.value.firstOrNull { it.id == id }
-            ?: novelDao.getNovelById(id)?.toDomainModel()
-            ?: SampleUrduNovels.novelsList.firstOrNull { it.id == id }
+            ?: novelDao.getNovelById(id)?.takeIf { !getDeletedNovelIds().contains(it.id) }?.toDomainModel()
+            ?: SampleUrduNovels.novelsList.firstOrNull { it.id == id && !getDeletedNovelIds().contains(id) }
     }
 
     fun getChapters(novelId: String): List<Chapter> {
+        if (getDeletedNovelIds().contains(novelId)) return emptyList()
+        val novel = getNovelById(novelId) ?: return emptyList()
+
         val roomChaps = cachedRoomChaptersMap[novelId]?.filter { it.content.isNotBlank() }
         if (!roomChaps.isNullOrEmpty()) {
             return roomChaps.sortedBy { it.chapterNumber }
         }
-        val sample = SampleUrduNovels.chaptersMap[novelId] ?: emptyList()
+
         val custom = inMemoryCustomChapters[novelId] ?: emptyList()
-        return (sample + custom).sortedBy { it.chapterNumber }
+        if (custom.isNotEmpty()) {
+            return custom.sortedBy { it.chapterNumber }
+        }
+
+        // Only fall back to sample chapters if novel is active and marked as downloaded
+        if (novel.isDownloaded) {
+            val sample = SampleUrduNovels.chaptersMap[novelId] ?: emptyList()
+            return sample.sortedBy { it.chapterNumber }
+        }
+
+        return emptyList()
     }
 
     suspend fun getChaptersAsync(novelId: String): List<Chapter> = withContext(Dispatchers.IO) {
+        if (getDeletedNovelIds().contains(novelId)) return@withContext emptyList()
+        val novel = getNovelByIdAsync(novelId) ?: return@withContext emptyList()
+
         val entities = chapterDao.getChaptersForNovel(novelId).filter { it.content.isNotBlank() }
         if (entities.isNotEmpty()) {
             return@withContext entities.map { it.toDomainModel() }
         }
-        // Fallback to sample map
-        SampleUrduNovels.chaptersMap[novelId] ?: emptyList()
+
+        val custom = inMemoryCustomChapters[novelId] ?: emptyList()
+        if (custom.isNotEmpty()) {
+            return@withContext custom.sortedBy { it.chapterNumber }
+        }
+
+        if (novel.isDownloaded) {
+            return@withContext SampleUrduNovels.chaptersMap[novelId] ?: emptyList()
+        }
+
+        return@withContext emptyList()
     }
 
     fun getChapter(novelId: String, chapterId: String): Chapter? {
@@ -477,6 +531,11 @@ class NovelRepository(private val context: Context) {
         repositoryScope.launch {
             _novels.value.forEach { novel ->
                 novelDao.updateReadingProgress(novel.id, 0f, null, 0)
+                prefs.edit()
+                    .remove("last_chap_${novel.id}")
+                    .remove("last_offset_${novel.id}")
+                    .remove("last_prog_${novel.id}")
+                    .apply()
             }
             _novels.value = _novels.value.map { it.copy(readingProgress = 0f) }
             bookmarkDao.clearAllBookmarks()
@@ -489,6 +548,7 @@ class NovelRepository(private val context: Context) {
     // -------------------------------------------------------------
 
     suspend fun downloadNovel(novelId: String): Pair<Boolean, String> = withContext(Dispatchers.IO) {
+        unmarkNovelAsDeleted(novelId)
         val novel = getNovelByIdAsync(novelId) ?: return@withContext Pair(false, "ناول نہیں ملا")
 
         // Set status to DOWNLOADING
@@ -585,10 +645,20 @@ class NovelRepository(private val context: Context) {
         try {
             // Delete chapters from Room and clear in-memory cache so re-downloading gets fresh full chapter content
             chapterDao.deleteChaptersForNovel(novelId)
+            bookmarkDao.deleteBookmarksForNovel(novelId)
             cachedRoomChaptersMap.remove(novelId)
             inMemoryCustomChapters.remove(novelId)
+
+            _bookmarks.value = _bookmarks.value.filterNot { it.novelId == novelId }
             updateNovelDownloadStatus(novelId, DownloadStatus.NOT_DOWNLOADED)
-            Pair(true, "ناول \"${novel.title}\" کا آف لائن کیشے کامیابی سے خارج کر دیا گیا")
+
+            prefs.edit()
+                .remove("last_chap_$novelId")
+                .remove("last_offset_$novelId")
+                .remove("last_prog_$novelId")
+                .apply()
+
+            Pair(true, "ناول \"${novel.title}\" کا آف لائن کیشے اور ڈیٹا کامیابی سے خارج کر دیا گیا")
         } catch (e: Exception) {
             Pair(false, "خارج کرنے میں خرابی: ${e.localizedMessage}")
         }
@@ -1148,12 +1218,21 @@ class NovelRepository(private val context: Context) {
 
     suspend fun deleteNovel(novelId: String): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         try {
+            markNovelAsDeleted(novelId)
             novelDao.deleteNovelById(novelId)
             chapterDao.deleteChaptersForNovel(novelId)
             bookmarkDao.deleteBookmarksForNovel(novelId)
 
-            _novels.value = _novels.value.filterNot { it.id == novelId }
+            cachedRoomChaptersMap.remove(novelId)
             inMemoryCustomChapters.remove(novelId)
+            _novels.value = _novels.value.filterNot { it.id == novelId }
+            _bookmarks.value = _bookmarks.value.filterNot { it.novelId == novelId }
+
+            prefs.edit()
+                .remove("last_chap_$novelId")
+                .remove("last_offset_$novelId")
+                .remove("last_prog_$novelId")
+                .apply()
 
             // Delete from Supabase if connected
             val config = _supabaseConfig.value
@@ -1163,9 +1242,55 @@ class NovelRepository(private val context: Context) {
                     client.deleteNovel("eq.${novelId.toValidUuidString()}", config.anonKey, "Bearer ${config.anonKey}")
                 }
             }
-            Pair(true, "ناول اور تمام متعلقہ ابواب کامیابی سے حذف کر دیے گئے")
+            Pair(true, "ناول اور اس کا تمام ڈیٹا کامیابی سے مستقل طور پر حذف کر دیا گیا")
         } catch (e: Exception) {
             Pair(false, "حذف کرنے میں خرابی: ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun restoreDefaultSampleData(): Pair<Boolean, String> = withContext(Dispatchers.IO) {
+        try {
+            prefs.edit().remove("deleted_novel_ids").putBoolean("has_seeded_database", false).apply()
+            val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date())
+
+            val authorEntities = SampleUrduNovels.sampleAuthors.map { AuthorEntity.fromDomainModel(it) }
+            authorDao.insertAuthors(authorEntities)
+
+            val categories = NovelCategory.entries.map {
+                CategoryEntity(id = it.name.lowercase(), nameUrdu = it.urduName, nameEnglish = it.englishName, createdAt = now)
+            }
+            categoryDao.insertCategories(categories)
+
+            val novelEntities = SampleUrduNovels.novelsList.map { novel ->
+                NovelEntity.fromDomainModel(novel, DownloadStatus.AVAILABLE_OFFLINE).copy(
+                    createdAt = now,
+                    updatedAt = now,
+                    isDownloaded = true
+                )
+            }
+            novelDao.insertNovels(novelEntities)
+
+            val chapterEntities = mutableListOf<ChapterEntity>()
+            SampleUrduNovels.chaptersMap.forEach { (novelId, chapList) ->
+                chapList.forEach { ch ->
+                    chapterEntities.add(
+                        ChapterEntity.fromDomainModel(ch, DownloadStatus.AVAILABLE_OFFLINE).copy(
+                            createdAt = now,
+                            updatedAt = now,
+                            isDownloaded = true
+                        )
+                    )
+                }
+            }
+            chapterDao.insertChapters(chapterEntities)
+            prefs.edit().putBoolean("has_seeded_database", true).apply()
+
+            val allEntities = novelDao.getAllNovelsFlow().first()
+            _novels.value = allEntities.map { it.toDomainModel() }
+
+            Pair(true, "تمام نمونہ ناولز کامیابی سے بحال کر دیے گئے")
+        } catch (e: Exception) {
+            Pair(false, "بحالی میں خرابی: ${e.localizedMessage}")
         }
     }
 
