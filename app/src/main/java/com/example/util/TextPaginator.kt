@@ -95,7 +95,13 @@ object TextPaginator {
         var currentPageStartOffset = 0
         var currentPageEndOffset = 0
         val currentPageBuffer = StringBuilder()
-        var currentHeight = 0f
+
+        // Strict discrete line limit calculation:
+        // In Jetpack Compose, each line takes exactly `textSizePx * lineSpacingMultiplier`
+        val effectiveLineHeight = (textSizePx * lineSpacingMultiplier).coerceAtLeast(1f)
+        // Reserve at least 0.45 of a line for Nastaliq descenders & safety margin
+        val maxLinesPerPage = ((heightPx - (effectiveLineHeight * 0.45f)) / effectiveLineHeight).toInt().coerceAtLeast(1)
+        var currentLinesOnPage = 0
 
         fun finishCurrentPage() {
             if (currentPageBuffer.isNotEmpty()) {
@@ -112,7 +118,7 @@ object TextPaginator {
                     )
                 )
                 currentPageBuffer.clear()
-                currentHeight = 0f
+                currentLinesOnPage = 0
             }
         }
 
@@ -123,7 +129,7 @@ object TextPaginator {
                 continue
             }
 
-            // Create StaticLayout for this paragraph to get exact line breaks and heights
+            // Create StaticLayout for this paragraph to get exact line breaks
             val layout = createStaticLayout(p.text, textPaint, widthPx, lineSpacingMultiplier)
 
             for (line in 0 until layout.lineCount) {
@@ -131,14 +137,8 @@ object TextPaginator {
                 val lineEnd = layout.getLineEnd(line)
                 val lineText = p.text.substring(lineStart, lineEnd)
 
-                // Exact line height matching Jetpack Compose Text(lineHeight = textSize * multiplier)
-                val lineActualHeight = textSizePx * lineSpacingMultiplier
-
-                // Page text body height
-                val maxAllowedHeight = heightPx.toFloat()
-
-                // Check if adding this line exceeds available page height
-                if (currentHeight + lineActualHeight > maxAllowedHeight && currentPageBuffer.isNotEmpty()) {
+                // Check if adding this line exceeds the discrete line limit for the page
+                if (currentLinesOnPage >= maxLinesPerPage && currentPageBuffer.isNotEmpty()) {
                     finishCurrentPage()
                     currentPageStartOffset = p.startOffset + lineStart
                 }
@@ -149,12 +149,18 @@ object TextPaginator {
 
                 currentPageBuffer.append(lineText)
                 currentPageEndOffset = p.startOffset + lineEnd
-                currentHeight += lineActualHeight
+                currentLinesOnPage++
             }
 
             // Paragraph ends with a clean newline for the next paragraph
             if (currentPageBuffer.isNotEmpty() && !currentPageBuffer.endsWith("\n")) {
-                currentPageBuffer.append("\n")
+                if (currentLinesOnPage >= maxLinesPerPage) {
+                    // No room for an empty paragraph gap on this page; next paragraph begins on fresh page
+                    finishCurrentPage()
+                } else {
+                    currentPageBuffer.append("\n")
+                    currentLinesOnPage++
+                }
             }
         }
 

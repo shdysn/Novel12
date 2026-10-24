@@ -197,11 +197,11 @@ fun ReaderScreen(
         val textWidthDp = (screenWidthDp - (sheetHorizPadding * 2) - (readerSettings.horizontalMarginDp * 2).dp - extraHorizPadDp).coerceAtLeast(100.dp)
 
         // Exact vertical overhead calculation:
-        // System insets + Sheet padding (8dp) + Page column padding (extraVertPadDp + verticalMargin*2) + Header/Footer (~48dp)
+        // System insets + Sheet desk padding + Page column padding + Header (~42dp) + Footer (~40dp) + Spacers (12dp) + Safety buffer
         val insets = WindowInsets.systemBars.asPaddingValues()
         val sysBarsHeight = insets.calculateTopPadding() + insets.calculateBottomPadding()
-        val extraVertPadDp = if (readerSettings.showBookFrame) 10.dp else 4.dp
-        val bookOverheadDp = sysBarsHeight + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 64.dp
+        val extraVertPadDp = if (readerSettings.showBookFrame) 12.dp else 6.dp
+        val bookOverheadDp = sysBarsHeight + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 106.dp
         val textHeightDp = (screenHeightDp - bookOverheadDp).coerceAtLeast(150.dp)
 
         val widthPx = with(density) { textWidthDp.roundToPx() }
