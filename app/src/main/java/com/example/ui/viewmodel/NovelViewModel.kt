@@ -47,6 +47,7 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
     val selectedCategory: StateFlow<NovelCategory> = _selectedCategory.asStateFlow()
 
     val allNovels: StateFlow<List<Novel>> = repository.novels
+    val novels: StateFlow<List<Novel>> = repository.novels
     val authors: StateFlow<List<Author>> = repository.authors
     val bookmarks: StateFlow<List<Bookmark>> = repository.bookmarks
     val recentSearches: StateFlow<List<String>> = repository.recentSearches
@@ -314,6 +315,18 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
             }
             showMessage("Supabase کلاؤڈ پر ناول پش ہو رہا ہے...")
             val (success, message) = repository.pushNovelToSupabase(novelId)
+            showMessage(message)
+        }
+    }
+
+    fun pushAllNovelsToCloud() {
+        viewModelScope.launch {
+            if (!repository.supabaseConfig.value.isConfigured) {
+                showMessage("کلاؤڈ اپ لوڈ کے لیے پہلے Supabase URL اور Anon Key درج کریں")
+                return@launch
+            }
+            showMessage("تمام ناولز Supabase کلاؤڈ پر اپ لوڈ ہو رہے ہیں...")
+            val (success, message) = repository.pushAllNovelsToSupabase()
             showMessage(message)
         }
     }

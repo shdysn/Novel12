@@ -1059,6 +1059,39 @@ class NovelRepository(private val context: Context) {
         }
     }
 
+    suspend fun pushAllNovelsToSupabase(): Pair<Boolean, String> = withContext(Dispatchers.IO) {
+        val config = _supabaseConfig.value
+        if (!config.isConfigured) {
+            return@withContext Pair(false, "ڈیٹا کلاؤڈ پر اپ لوڈ کرنے کے لیے پہلے Supabase URL اور Key درج کریں")
+        }
+        val novelsList = _novels.value
+        if (novelsList.isEmpty()) {
+            return@withContext Pair(false, "اپ لوڈ کرنے کے لیے کوئی ناول موجود نہیں ہے")
+        }
+        _syncingState.value = true
+        var successCount = 0
+        var lastErr = ""
+        try {
+            for (novel in novelsList) {
+                val (success, err) = pushNovelToSupabase(novel.id)
+                if (success) {
+                    successCount++
+                } else {
+                    lastErr = err
+                }
+            }
+            if (successCount > 0) {
+                Pair(true, "$successCount ناولز مع ابواب کامیابی سے Supabase کلاؤڈ پر اپ لوڈ ہو گئے!")
+            } else {
+                Pair(false, "اپ لوڈ ناکام رہا: $lastErr")
+            }
+        } catch (e: Exception) {
+            Pair(false, "کلاؤڈ اپ لوڈ کے دوران خرابی: ${e.localizedMessage ?: "نیٹ ورک کا مسئلہ"}")
+        } finally {
+            _syncingState.value = false
+        }
+    }
+
     // -------------------------------------------------------------
     // ADMIN / PUBLISHER MANAGEMENT
     // -------------------------------------------------------------
