@@ -79,6 +79,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -87,7 +88,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import com.example.data.model.toUrduDigits
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -1059,81 +1062,7 @@ private fun SinglePageView(
                 }
             }
 
-            // 4. BOTTOM RUNNING BOOK FOLIO (BACKGROUND LAYER AT BOTTOM)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(
-                        start = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 4)).dp,
-                        end = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 4)).dp,
-                        bottom = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 4)).dp
-                    )
-            ) {
-                // Subtle hairline rule above page number
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(0.6.dp)
-                            .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
-                    )
-                    Text(
-                        text = " ❖ ",
-                        fontSize = 7.sp,
-                        color = if (isPureWhite) Color.Black.copy(alpha = 0.4f) else GoldAccent.copy(alpha = 0.6f),
-                        modifier = Modifier.padding(horizontal = 3.dp)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(0.6.dp)
-                            .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(3.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Right: Chapter info
-                    Text(
-                        text = "باب $chapterNumberDisplay",
-                        fontFamily = fontFam,
-                        fontSize = 10.sp,
-                        color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
-                    )
-
-                    // Center: Authentic Printed Page Number
-                    Text(
-                        text = "—  $pageNumberDisplay  —",
-                        fontFamily = fontFam,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
-                        color = if (isPureWhite) Color.Black.copy(alpha = 0.8f) else activeTheme.textColor.copy(alpha = 0.75f)
-                    )
-
-                    // Left: Page Count Progress
-                    Text(
-                        text = "$pageNumberDisplay / $totalPagesDisplay",
-                        fontFamily = fontFam,
-                        fontSize = 10.sp,
-                        color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
-                    )
-                }
-            }
-
-            // 5. Complete Book Page Content: Header/Unwan + Body Text with generous clearance above footer
+            // 4. Unified Sequential Page Layout (Header -> Body [weight 1f, clipToBounds] -> Footer)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -1141,11 +1070,11 @@ private fun SinglePageView(
                         start = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
                         end = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
                         top = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 2)).dp,
-                        bottom = (readerSettings.verticalMarginDp + 40).dp // 40dp dedicated buffer so text NEVER touches or hides behind footer
+                        bottom = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 3)).dp
                     )
             ) {
-                // TOP RUNNING BOOK HEADER:
-                // Suppressed on chapter opening page (page 1) as in real printed novels!
+                // [A] TOP RUNNING BOOK HEADER:
+                // Suppressed on chapter opening page (page 1) as in real printed novels
                 if (!page.isFirstPageOfChapter) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -1243,11 +1172,12 @@ private fun SinglePageView(
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 
-                // --- PAGE BODY TEXT ---
+                // [B] PAGE BODY TEXT CONTAINER (Strict bounded container with clipToBounds)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .clipToBounds()
                 ) {
                     Text(
                         text = annotatedText,
@@ -1256,8 +1186,82 @@ private fun SinglePageView(
                         lineHeight = (readerSettings.fontSizeSp * readerSettings.lineHeightMultiplier).sp,
                         color = activeTheme.textColor,
                         textAlign = composeTextAlign,
+                        style = TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // [C] BOTTOM RUNNING BOOK FOLIO (Sequential footer at the bottom of the column)
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Subtle hairline rule above page number
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(0.6.dp)
+                                .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
+                        )
+                        Text(
+                            text = " ❖ ",
+                            fontSize = 7.sp,
+                            color = if (isPureWhite) Color.Black.copy(alpha = 0.4f) else GoldAccent.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(horizontal = 3.dp)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(0.6.dp)
+                                .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Right: Chapter info
+                        Text(
+                            text = "باب $chapterNumberDisplay",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
+                        )
+
+                        // Center: Authentic Printed Page Number
+                        Text(
+                            text = "—  $pageNumberDisplay  —",
+                            fontFamily = fontFam,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            color = if (isPureWhite) Color.Black.copy(alpha = 0.8f) else activeTheme.textColor.copy(alpha = 0.75f)
+                        )
+
+                        // Left: Page Count Progress
+                        Text(
+                            text = "$pageNumberDisplay / $totalPagesDisplay",
+                            fontFamily = fontFam,
+                            fontSize = 10.sp,
+                            color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
+                        )
+                    }
                 }
             }
         }
