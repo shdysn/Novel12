@@ -132,11 +132,41 @@ fun NovelVerticalCard(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "✤",
-                                color = GoldAccent,
-                                fontSize = 8.sp
-                            )
+                            // Views count badge matching reference screenshot (e.g. 1.6M, 2.5M, 4.5M)
+                            val formattedViews = when {
+                                novel.viewsCount >= 1_000_000 -> "%.1fM".format(novel.viewsCount / 1_000_000f)
+                                novel.viewsCount >= 1_000 -> "%.1fK".format(novel.viewsCount / 1_000f)
+                                else -> "${novel.viewsCount}"
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = Color.Black.copy(alpha = 0.5f)
+                                ) {
+                                    Text(
+                                        text = "👁 $formattedViews",
+                                        color = Color.White,
+                                        fontSize = 8.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = Color.Black.copy(alpha = 0.5f)
+                                ) {
+                                    Text(
+                                        text = "%.1f ★".format(novel.rating),
+                                        color = GoldAccent,
+                                        fontSize = 8.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -134,6 +134,12 @@ class NovelRepository(private val context: Context) {
         prefs.edit().putInt("daily_goal_minutes", clamped).apply()
     }
 
+    fun toggleNotifications() {
+        val newVal = !notificationsEnabled.value
+        notificationsEnabled.value = newVal
+        prefs.edit().putBoolean("pref_notif", newVal).apply()
+    }
+
     init {
         loadSettings()
         loadSupabaseConfig()

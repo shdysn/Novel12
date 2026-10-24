@@ -3,7 +3,6 @@ package com.example.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,41 +19,39 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.NotificationsActive
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,16 +59,18 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.Novel
 import com.example.data.model.NovelCategory
 import com.example.ui.components.AuthorCard
-import com.example.ui.components.ContinueReadingCard
-import com.example.ui.components.CoverGradients
-import com.example.ui.components.NovelCoverCard
 import com.example.ui.components.NovelVerticalCard
-import com.example.ui.theme.EmeraldDark
-import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.MidnightDarkSurface
+import com.example.ui.theme.MidnightDarkSurfaceElevated
+import com.example.ui.theme.TextMutedPurple
 import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
+/**
+ * Screen 1: ہوم اسکرین (Writer's Highlight / Home Screen)
+ * Directly matches Screen 1 of the reference mockup in Dark Midnight Purple & Gold.
+ */
 @Composable
 fun HomeScreen(
     viewModel: NovelViewModel,
@@ -81,300 +80,129 @@ fun HomeScreen(
     val continueReadingNovels by viewModel.continueReadingNovels.collectAsState()
     val trendingNovels by viewModel.trendingNovels.collectAsState()
     val newNovels by viewModel.newNovels.collectAsState()
-    val recommendedNovels by viewModel.recommendedNovels.collectAsState()
     val authors by viewModel.authors.collectAsState()
 
-    val featuredNovel = allNovels.firstOrNull { it.id == "novel_peer_e_kamil" } ?: allNovels.firstOrNull()
+    val currentReadingNovel = continueReadingNovels.firstOrNull() ?: allNovels.firstOrNull()
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
             .testTag("home_screen"),
         contentPadding = PaddingValues(bottom = 96.dp)
     ) {
-        // 1. Premium Top App Bar & Welcome Section
+        // -------------------------------------------------------------
+        // 1. TOP BAR: "ہیلو، قاری!" & Notification Bell
+        // -------------------------------------------------------------
         item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(EmeraldDark, EmeraldPrimary)
-                        )
-                    )
-                    .statusBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 14.dp)
-            ) {
-                // Top App Bar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Profile Avatar with Gold Border
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { viewModel.selectTab(4) } // Profile tab
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(42.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF246D55))
-                                .border(1.5.dp, GoldAccent, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "ش",
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Color.White
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        Column {
-                            Text(
-                                text = "خوش آمدید",
-                                fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                            Text(
-                                text = "شاہد ثاقب",
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
-                                color = Color.White
-                            )
-                        }
-                    }
-
-                    // App Title Center
-                    Text(
-                        text = "داستانِ نو",
-                        fontFamily = UrduFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = GoldAccent
-                    )
-
-                    // Action Icons: Search & Notifications
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(
-                            onClick = { viewModel.selectTab(2) }, // Search tab
-                            modifier = Modifier.size(38.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "تلاش کریں",
-                                tint = Color.White
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { viewModel.showMessage("آپ کے لیے 2 نئے ابواب دستیاب ہیں") },
-                            modifier = Modifier.size(38.dp)
-                        ) {
-                            BadgedBox(
-                                badge = {
-                                    Badge(containerColor = GoldAccent) {
-                                        Text("2", color = Color.Black, fontSize = 9.sp)
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "اطلاعات",
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Welcome Literature Quote / Heading
-                Column {
-                    Text(
-                        text = "آج آپ کون سا شاہکار پڑھنا چاہیں گے؟",
-                        fontFamily = UrduFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "اردو ادب کا سب سے بڑا ڈیجیٹل کتب خانہ — خالص یونیکوڈ متن میں",
-                        fontFamily = UrduFontFamily,
-                        fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.85f),
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-            }
-        }
-
-        // 2. Large Featured Novel Card
-        if (featuredNovel != null) {
-            item {
-                FeaturedNovelHero(
-                    novel = featuredNovel,
-                    onReadClick = { viewModel.navigateToReader(featuredNovel.id) },
-                    onDetailsClick = { viewModel.navigateToDetail(featuredNovel.id) }
-                )
-            }
-        }
-
-        // 3. Continue Reading Section (دوبارہ پڑھنا جاری رکھیں)
-        if (continueReadingNovels.isNotEmpty()) {
-            item {
-                HomeSectionHeader(
-                    title = "دوبارہ پڑھنا جاری رکھیں",
-                    subtitle = "جہاں سے چھوڑا تھا وہیں سے شروع کریں",
-                    showAction = true,
-                    actionText = "تمام دیکھیں",
-                    onActionClick = { viewModel.selectTab(3) } // Library
-                )
-            }
-
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    continueReadingNovels.take(2).forEach { novel ->
-                        ContinueReadingCard(
-                            novel = novel,
-                            onResumeClick = { viewModel.navigateToReader(novel.id) }
-                        )
-                    }
-                }
-            }
-        }
-
-        // 4. Horizontal "مشہور ناولز" (Popular Novels)
-        item {
-            HomeSectionHeader(
-                title = "مشہور اور مقبول ترین ناولز",
-                subtitle = "قارئین کی پہلی پسند",
-                showAction = true,
-                actionText = "سب دیکھیں",
-                onActionClick = {
-                    viewModel.selectCategory(NovelCategory.ALL)
-                    viewModel.selectTab(1)
-                }
-            )
-        }
-
-        item {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                items(trendingNovels, key = { it.id }) { novel ->
-                    NovelVerticalCard(
-                        novel = novel,
-                        onClick = { viewModel.navigateToDetail(novel.id) }
-                    )
-                }
-            }
-        }
-
-        // 5. Genres / Categories Horizontal Chips
-        item {
-            HomeSectionHeader(
-                title = "اصناف و موضوعات (Genres)",
-                subtitle = "اپنی پسندیدہ صنف منتخب کریں",
-                showAction = true,
-                actionText = "تمام اصناف",
-                onActionClick = { viewModel.selectTab(1) }
-            )
-        }
-
-        item {
-            val categoriesList = listOf(
-                NovelCategory.MOHABBAT,
-                NovelCategory.ROMANCE,
-                NovelCategory.SPY,
-                NovelCategory.SUSPENSE,
-                NovelCategory.HISTORICAL,
-                NovelCategory.ISLAHI,
-                NovelCategory.SOCIAL,
-                NovelCategory.SPIRITUAL,
-                NovelCategory.CLASSIC
-            )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                categoriesList.forEach { category ->
-                    FilterChip(
-                        selected = false,
-                        onClick = {
-                            viewModel.selectCategory(category)
-                            viewModel.selectTab(1) // Navigate to categories
-                        },
-                        label = {
-                            Text(
-                                text = category.urduName,
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        },
-                        leadingIcon = {
-                            Text("✦", color = GoldAccent, fontSize = 10.sp)
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        shape = RoundedCornerShape(20.dp)
+                Text(
+                    text = "ہیلو، قاری!",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = Color.White
+                )
+
+                IconButton(
+                    onClick = { viewModel.showMessage("آپ کے لیے نئے ابواب دستیاب ہیں") },
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MidnightDarkSurfaceElevated)
+                ) {
+                    BadgedBox(
+                        badge = {
+                            Badge(containerColor = GoldAccent)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "اطلاعات",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 2. SEARCH BAR: "ناول، مصنف تلاش کریں"
+        // -------------------------------------------------------------
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 4.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(MidnightDarkSurfaceElevated)
+                    .border(1.dp, Color(0xFF2F2948), RoundedCornerShape(24.dp))
+                    .clickable { viewModel.selectTab(2) } // Navigate to Search tab
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "تلاش",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "ناول، مصنف تلاش کریں",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 14.sp,
+                        color = TextMutedPurple
                     )
                 }
             }
         }
 
-        // 6. "نئے ناولز" (New Releases)
+        // -------------------------------------------------------------
+        // 3. POPULAR AUTHORS: "مقبول مصنفین" (With Gold Rings & Follow Pills)
+        // -------------------------------------------------------------
         item {
-            HomeSectionHeader(
-                title = "نئے شامل کردہ ناولز",
-                subtitle = "تازہ ترین اشاعتیں اور ابواب",
-                showAction = true,
-                actionText = "مزید",
-                onActionClick = { viewModel.selectTab(1) }
-            )
-        }
-
-        item {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(newNovels, key = { it.id }) { novel ->
-                    NovelVerticalCard(
-                        novel = novel,
-                        onClick = { viewModel.navigateToDetail(novel.id) }
+                Text(
+                    text = "مقبول مصنفین",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Previous",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Next",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
-        }
-
-        // 7. Popular Authors ("مقبول مصنفین")
-        item {
-            HomeSectionHeader(
-                title = "مقبول اور معتبر مصنفین",
-                subtitle = "اردو ادب کے نامور ادیب اور قلم کار",
-                showAction = false
-            )
         }
 
         item {
@@ -386,246 +214,322 @@ fun HomeScreen(
                     AuthorCard(
                         author = author,
                         onClick = {
-                            viewModel.setSearchQuery(author.name)
-                            viewModel.selectTab(2) // Jump to search
+                            viewModel.navigateToAuthorDetail(author.id)
                         }
                     )
                 }
             }
         }
 
-        // 8. "آپ کے لیے منتخب" (Recommended for you)
+        // -------------------------------------------------------------
+        // 4. CATEGORY TILES (4 Square Cards: رومانوی، جاسوسی، تاریخی، ادبی)
+        // -------------------------------------------------------------
         item {
-            HomeSectionHeader(
-                title = "آپ کے لیے منتخب ناولز",
-                subtitle = "اعلیٰ ریٹنگ اور بہترین کلام",
-                showAction = false
-            )
+            Spacer(modifier = Modifier.height(18.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                CategoryGridItem(
+                    title = "رومانوی",
+                    icon = Icons.Default.Favorite,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        viewModel.selectCategory(NovelCategory.MOHABBAT)
+                        viewModel.selectTab(1)
+                    }
+                )
+                CategoryGridItem(
+                    title = "جاسوسی",
+                    icon = Icons.Default.Search,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        viewModel.selectCategory(NovelCategory.SPY)
+                        viewModel.selectTab(1)
+                    }
+                )
+                CategoryGridItem(
+                    title = "تاریخی",
+                    icon = Icons.Default.AccountBalance,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        viewModel.selectCategory(NovelCategory.HISTORICAL)
+                        viewModel.selectTab(1)
+                    }
+                )
+                CategoryGridItem(
+                    title = "ادبی",
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        viewModel.selectCategory(NovelCategory.CLASSIC)
+                        viewModel.selectTab(1)
+                    }
+                )
+            }
         }
 
-        items(recommendedNovels.take(3), key = { it.id }) { novel ->
-            Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
-                NovelCoverCard(
-                    novel = novel,
-                    onClick = { viewModel.navigateToDetail(novel.id) },
-                    onToggleFavorite = { viewModel.toggleFavorite(novel.id) }
+        // -------------------------------------------------------------
+        // 5. CONTINUE READING CARD: "پڑھنا جاری رکھیں"
+        // -------------------------------------------------------------
+        if (currentReadingNovel != null) {
+            item {
+                Spacer(modifier = Modifier.height(18.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "پڑھنا جاری رکھیں",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = Color.White
+                    )
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 6.dp)
+                        .clickable { viewModel.navigateToReader(currentReadingNovel.id) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF383058))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Novel Mini Cover Thumbnail
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp, 68.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF282343))
+                                .border(1.dp, GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = currentReadingNovel.title.take(6),
+                                fontFamily = UrduFontFamily,
+                                fontSize = 10.sp,
+                                color = GoldAccent,
+                                maxLines = 2,
+                                modifier = Modifier.padding(2.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        // Text & Progress
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = currentReadingNovel.title,
+                                fontFamily = UrduFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Text(
+                                text = "پڑھنا جاری رکھیں — از ${currentReadingNovel.author}",
+                                fontFamily = UrduFontFamily,
+                                fontSize = 11.sp,
+                                color = TextMutedPurple
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            val progressVal = if (currentReadingNovel.readingProgress > 0f) currentReadingNovel.readingProgress else 0.35f
+                            LinearProgressIndicator(
+                                progress = { progressVal },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(4.dp)
+                                    .clip(RoundedCornerShape(2.dp)),
+                                color = GoldAccent,
+                                trackColor = Color(0xFF2A2345)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 6. POPULAR NOVELS: "مقبول ترین ناول"
+        // -------------------------------------------------------------
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "مقبول ترین ناول",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
                 )
+
+                TextButton(onClick = { viewModel.selectTab(1) }) {
+                    Text(
+                        text = "سبھی دیکھیں",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 13.sp,
+                        color = GoldAccent
+                    )
+                }
+            }
+        }
+
+        item {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                items(trendingNovels.ifEmpty { allNovels.take(6) }, key = { it.id }) { novel ->
+                    NovelVerticalCard(
+                        novel = novel,
+                        onClick = { viewModel.navigateToDetail(novel.id) }
+                    )
+                }
+            }
+        }
+
+        // Full Width Gold Pill: "سبھی نوول دیکھیں"
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            ) {
+                Button(
+                    onClick = { viewModel.selectTab(1) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(22.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldAccent,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text(
+                        text = "سبھی نوول دیکھیں",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 7. LATEST NOVELS: "تازہ ترین"
+        // -------------------------------------------------------------
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "تازہ ترین",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Previous",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Next",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+
+        item {
+            val latestList = if (newNovels.isNotEmpty()) newNovels else allNovels.takeLast(4)
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                items(latestList, key = { it.id }) { novel ->
+                    NovelVerticalCard(
+                        novel = novel,
+                        onClick = { viewModel.navigateToDetail(novel.id) }
+                    )
+                }
             }
         }
     }
 }
 
+/**
+ * 4 Category Grid Box matching Screen 1 in reference mockup
+ */
 @Composable
-private fun HomeSectionHeader(
+private fun CategoryGridItem(
     title: String,
-    subtitle: String,
-    showAction: Boolean = false,
-    actionText: String = "",
-    onActionClick: () -> Unit = {}
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Card(
+        modifier = modifier
+            .height(72.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2E274A))
     ) {
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = GoldAccent,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = title,
                 fontFamily = UrduFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 17.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = subtitle,
-                fontFamily = UrduFontFamily,
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-
-        if (showAction) {
-            Text(
-                text = actionText,
-                fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp,
-                color = EmeraldPrimary,
-                modifier = Modifier
-                    .clickable(onClick = onActionClick)
-                    .padding(4.dp)
+                fontSize = 11.sp,
+                color = Color.White
             )
-        }
-    }
-}
-
-@Composable
-private fun FeaturedNovelHero(
-    novel: Novel,
-    onReadClick: () -> Unit,
-    onDetailsClick: () -> Unit
-) {
-    val gradientColors = CoverGradients[novel.coverGradientIndex % CoverGradients.size]
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp)
-            .clickable(onClick = onDetailsClick)
-            .testTag("featured_hero_card"),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(EmeraldDark, Color(0xFF132F24))
-                    )
-                )
-                .padding(18.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Book Cover preview
-                Box(
-                    modifier = Modifier
-                        .width(96.dp)
-                        .height(138.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Brush.verticalGradient(gradientColors))
-                        .border(1.5.dp, GoldAccent.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text(text = "✦", color = GoldAccent, fontSize = 10.sp)
-                        Text(
-                            text = novel.title,
-                            color = Color.White,
-                            fontFamily = UrduFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = novel.author,
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontFamily = UrduFontFamily,
-                            fontSize = 9.sp,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            maxLines = 1
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Novel metadata & Read Now button
-                Column(modifier = Modifier.weight(1f)) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = GoldAccent.copy(alpha = 0.2f)
-                    ) {
-                        Text(
-                            text = "آج کا شاہکار انتخاب",
-                            fontFamily = UrduFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
-                            color = GoldAccent,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = novel.title,
-                        fontFamily = UrduFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 19.sp,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Text(
-                        text = "از ${novel.author}",
-                        fontFamily = UrduFontFamily,
-                        fontSize = 13.sp,
-                        color = GoldAccent,
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
-
-                    Text(
-                        text = novel.synopsis,
-                        fontFamily = UrduFontFamily,
-                        fontSize = 11.sp,
-                        color = Color.White.copy(alpha = 0.75f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 13.2.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = onReadClick,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = GoldAccent,
-                                contentColor = Color(0xFF2C1E05)
-                            ),
-                            shape = RoundedCornerShape(10.dp),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "ابھی پڑھیں",
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
-                            )
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                tint = GoldAccent,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(
-                                text = "%.1f".format(novel.rating),
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }

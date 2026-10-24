@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,33 +17,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalLibrary
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -55,21 +50,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.data.model.Bookmark
 import com.example.data.model.Novel
-import com.example.ui.components.ContinueReadingCard
-import com.example.ui.components.NovelCoverCard
-import com.example.ui.theme.EmeraldDark
-import com.example.ui.theme.EmeraldPrimary
+import com.example.ui.components.NovelVerticalCard
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.MidnightDarkSurface
+import com.example.ui.theme.MidnightDarkSurfaceElevated
+import com.example.ui.theme.TextMutedPurple
 import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Screen 5: میری لائبریری (My Shelf / Library)
+ * Strictly matches Screen 5 of the reference mockup in Dark Midnight Purple & Gold.
+ */
 @Composable
 fun LibraryScreen(
     viewModel: NovelViewModel,
@@ -79,64 +77,70 @@ fun LibraryScreen(
     val allNovels by viewModel.allNovels.collectAsState()
     val continueReadingNovels by viewModel.continueReadingNovels.collectAsState()
 
-    // 0: میری کتابیں, 1: بک مارکس, 2: حال ہی میں پڑھے گئے, 3: ڈاؤن لوڈ شدہ, 4: پڑھنے کی تاریخ
+    // 0: پسندیدہ, 1: ڈاؤن لوڈز, 2: جاری
     var selectedTab by remember { mutableIntStateOf(0) }
 
     val downloadedNovels = allNovels.filter { it.isDownloaded }
-    val myBooks = allNovels.filter { it.isFavorite || it.readingProgress > 0f }
+    val favoriteNovels = allNovels.filter { it.isFavorite }
+    val activeNovels = if (continueReadingNovels.isNotEmpty()) continueReadingNovels else allNovels.take(4)
+
+    val currentTabNovels = when (selectedTab) {
+        0 -> if (favoriteNovels.isNotEmpty()) favoriteNovels else allNovels.take(6)
+        1 -> if (downloadedNovels.isNotEmpty()) downloadedNovels else allNovels.take(3)
+        else -> activeNovels
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
             .testTag("library_screen")
     ) {
-        // Top Header
-        Column(
+        // -------------------------------------------------------------
+        // 1. TOP HEADER: "میری لائبریری" in Gold
+        // -------------------------------------------------------------
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(EmeraldDark)
-                .statusBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocalLibrary,
-                    contentDescription = null,
-                    tint = GoldAccent,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "میری لائبریری (My Library)",
-                    fontFamily = UrduFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-            }
             Text(
-                text = "آپ کے محفوظ کردہ ناولز، بک مارکس اور مطالعہ کی سرگزشت",
+                text = "میری لائبریری",
                 fontFamily = UrduFontFamily,
-                fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(top = 2.dp)
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                color = GoldAccent
             )
         }
 
-        // 5 Library Categories Tabs
-        ScrollableTabRow(
+        // -------------------------------------------------------------
+        // 2. SEGMENTED TABS: "پسندیدہ" | "ڈاؤن لوڈز" | "جاری"
+        // -------------------------------------------------------------
+        val tabs = listOf("پسندیدہ", "ڈاؤن لوڈز", "جاری")
+        TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = MaterialTheme.colorScheme.surface,
-            edgePadding = 16.dp
+            containerColor = Color.Transparent,
+            contentColor = GoldAccent,
+            indicator = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                    color = GoldAccent,
+                    height = 2.dp
+                )
+            },
+            divider = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color(0xFF2E2748))
+                )
+            },
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            val tabs = listOf(
-                "میری کتابیں (${myBooks.size})",
-                "بک مارکس (${bookmarks.size})",
-                "حال ہی میں پڑھے گئے",
-                "ڈاؤن لوڈ شدہ (${downloadedNovels.size})",
-                "پڑھنے کی تاریخ"
-            )
-
             tabs.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTab == index,
@@ -146,414 +150,225 @@ fun LibraryScreen(
                             text = title,
                             fontFamily = UrduFontFamily,
                             fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
-                            fontSize = 13.sp
+                            fontSize = 14.sp,
+                            color = if (selectedTab == index) GoldAccent else TextMutedPurple
                         )
                     }
                 )
             }
         }
 
-        // Tab Content
+        Spacer(modifier = Modifier.height(14.dp))
+
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 96.dp)
         ) {
-            when (selectedTab) {
-                0 -> {
-                    // میری کتابیں (My Books / Saved)
-                    if (myBooks.isEmpty()) {
-                        item {
-                            EmptyLibraryState(
-                                title = "کوئی کتاب شامل نہیں",
-                                message = "کسی بھی ناول کو پڑھنا شروع کریں یا دل کے نشان پر ٹیپ کر کے لائبریری میں محفوظ کریں"
-                            )
-                        }
-                    } else {
-                        items(myBooks, key = { it.id }) { novel ->
-                            NovelCoverCard(
-                                novel = novel,
-                                onClick = { viewModel.navigateToDetail(novel.id) },
-                                onToggleFavorite = { viewModel.toggleFavorite(novel.id) }
-                            )
-                        }
-                    }
-                }
-
-                1 -> {
-                    // بک مارک کیے گئے ناولز
-                    if (bookmarks.isEmpty()) {
-                        item {
-                            EmptyLibraryState(
-                                title = "کوئی بک مارک موجود نہیں",
-                                message = "ناول کا مطالعہ کرتے وقت اوپر بک مارک آئیکون پر کلک کریں تاکہ وہ یہاں محفوظ ہو سکے"
-                            )
-                        }
-                    } else {
-                        items(bookmarks, key = { it.novelId + it.chapterId }) { bookmark ->
-                            BookmarkCard(
-                                bookmark = bookmark,
-                                onResumeClick = {
-                                    viewModel.navigateToReader(bookmark.novelId, bookmark.chapterId)
-                                },
-                                onRemoveClick = {
-                                    viewModel.repository.removeBookmark(bookmark.novelId)
-                                }
-                            )
-                        }
-                    }
-                }
-
-                2 -> {
-                    // حال ہی میں پڑھے گئے (Recently Read)
-                    if (continueReadingNovels.isEmpty()) {
-                        item {
-                            EmptyLibraryState(
-                                title = "حال ہی میں کچھ نہیں پڑھا گیا",
-                                message = "کسی بھی ناول کا مطالعہ شروع کریں، وہ یہاں خود بخود شامل ہو جائے گا"
-                            )
-                        }
-                    } else {
-                        items(continueReadingNovels, key = { it.id }) { novel ->
-                            ContinueReadingCard(
-                                novel = novel,
-                                onResumeClick = { viewModel.navigateToReader(novel.id) }
-                            )
-                        }
-                    }
-                }
-
-                3 -> {
-                    // ڈاؤن لوڈ کیے گئے ناولز (Offline)
-                    item {
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CloudDone,
-                                    contentDescription = null,
-                                    tint = EmeraldPrimary
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "یہ تمام ناولز آپ کے فون میں محفوظ ہیں اور انٹرنیٹ کے بغیر بھی پڑھے جا سکتے ہیں۔",
-                                    fontFamily = UrduFontFamily,
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                        }
-                    }
-
-                    if (downloadedNovels.isEmpty()) {
-                        item {
-                            EmptyLibraryState(
-                                title = "کوئی آف لائن ناول موجود نہیں",
-                                message = "کسی بھی ناول کی تفصیلات کھول کر 'آف لائن پڑھنے کے لیے محفوظ کریں' پر کلک کریں"
-                            )
-                        }
-                    } else {
-                        items(downloadedNovels, key = { it.id }) { novel ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { viewModel.navigateToDetail(novel.id) },
-                                shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = novel.title,
-                                            fontFamily = UrduFontFamily,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                        Text(
-                                            text = "مصنف: ${novel.author}  •  ${novel.totalChapters} ابواب  •  آف لائن محفوظ",
-                                            fontFamily = UrduFontFamily,
-                                            fontSize = 12.sp,
-                                            color = EmeraldPrimary
-                                        )
-                                    }
-
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        IconButton(
-                                            onClick = { viewModel.deleteDownloadedNovel(novel.id) }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = "Delete Offline Cache",
-                                                tint = MaterialTheme.colorScheme.outline
-                                            )
-                                        }
-
-                                        Button(
-                                            onClick = { viewModel.navigateToReader(novel.id) },
-                                            colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
-                                            shape = RoundedCornerShape(8.dp),
-                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
-                                        ) {
-                                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text("مطالعہ", fontFamily = UrduFontFamily, fontSize = 12.sp)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                4 -> {
-                    // پڑھنے کی تاریخ اور اعداد و شمار (Reading History & Stats)
-                    item {
-                        Card(
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    text = "مطالعہ کے اعداد و شمار (Reading Stats)",
-                                    fontFamily = UrduFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceAround
-                                ) {
-                                    ReadingStatItem("42 گھنٹے", "کل مطالعہ کا وقت")
-                                    ReadingStatItem("${allNovels.size}", "ناولز مکمل")
-                                    ReadingStatItem("7 دن", "مسلسل مطالعہ (Streak)")
-                                }
-                            }
-                        }
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "تاریخچہ مطالعہ",
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-
-                            IconButton(onClick = { viewModel.clearReadingHistory() }) {
-                                Icon(
-                                    imageVector = Icons.Default.DeleteSweep,
-                                    contentDescription = "Clear History",
-                                    tint = MaterialTheme.colorScheme.outline
-                                )
-                            }
-                        }
-                    }
-
-                    items(allNovels.filter { it.readingProgress > 0f }, key = { it.id }) { novel ->
-                        ContinueReadingCard(
-                            novel = novel,
-                            onResumeClick = { viewModel.navigateToReader(novel.id) }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReadingStatItem(value: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            fontFamily = UrduFontFamily,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            color = EmeraldPrimary
-        )
-        Text(
-            text = label,
-            fontFamily = UrduFontFamily,
-            fontSize = 11.sp,
-            color = MaterialTheme.colorScheme.outline
-        )
-    }
-}
-
-@Composable
-private fun BookmarkCard(
-    bookmark: Bookmark,
-    onResumeClick: () -> Unit,
-    onRemoveClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onResumeClick)
-            .testTag("bookmark_card_${bookmark.novelId}"),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Bookmark,
-                        contentDescription = "Bookmark",
-                        tint = GoldAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+            // ---------------------------------------------------------
+            // 3. آخری پڑھا ہوا (HORIZONTAL CAROUSEL OF RECENT NOVELS)
+            // ---------------------------------------------------------
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = bookmark.novelTitle,
+                        text = "آخری پڑھا ہوا",
                         fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                IconButton(
-                    onClick = onRemoveClick,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Remove Bookmark",
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-
-            Text(
-                text = "مصنف: ${bookmark.author}  •  ${bookmark.chapterTitle}",
-                fontFamily = UrduFontFamily,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // Reading Progress Bar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LinearProgressIndicator(
-                    progress = { bookmark.scrollProgressPercent.coerceIn(0.05f, 1f) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = EmeraldPrimary,
-                    trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "${(bookmark.scrollProgressPercent * 100).toInt()}% پڑھا گیا",
-                    fontFamily = UrduFontFamily,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clickable(onClick = onResumeClick)
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "وہیں سے جاری رکھیں",
-                        fontFamily = UrduFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
                         color = Color.White
                     )
                 }
             }
+
+            item {
+                val recentCards = if (continueReadingNovels.isNotEmpty()) continueReadingNovels else allNovels.take(3)
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(recentCards, key = { "recent_${it.id}" }) { novel ->
+                        Card(
+                            modifier = Modifier
+                                .width(120.dp)
+                                .clickable { viewModel.navigateToReader(novel.id) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2E2748))
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(130.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color(0xFF241E38))
+                                        .border(1.dp, GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                                        .padding(6.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = novel.title,
+                                        fontFamily = UrduFontFamily,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = GoldAccent,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 3
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(6.dp))
+
+                                Text(
+                                    text = novel.title,
+                                    fontFamily = UrduFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp,
+                                    color = Color.White,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MidnightDarkSurfaceElevated,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "1KD 85%",
+                                        fontSize = 9.sp,
+                                        color = GoldAccent,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 4. آخری پڑھا ہوا / LIBRARY GRID (3-COLUMN NOVEL CARDS)
+            // ---------------------------------------------------------
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "محفوظ شدہ کتب",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp,
+                        color = Color.White
+                    )
+                }
+            }
+
+            // 3-Column Grid of Novels
+            val chunkedNovels = currentTabNovels.chunked(3)
+            items(chunkedNovels) { rowNovels ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    rowNovels.forEach { novel ->
+                        LibraryGridCard(
+                            novel = novel,
+                            modifier = Modifier.weight(1f),
+                            onClick = { viewModel.navigateToDetail(novel.id) }
+                        )
+                    }
+                    // Fill remaining slots in row if less than 3
+                    repeat(3 - rowNovels.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
         }
     }
 }
 
+/**
+ * 3-Column Novel Card matching Screen 5 in reference mockup
+ */
 @Composable
-private fun EmptyLibraryState(
-    title: String,
-    message: String
+private fun LibraryGridCard(
+    novel: Novel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Card(
+        modifier = modifier
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2E2748))
     ) {
-        Icon(
-            imageVector = Icons.Default.BookmarkBorder,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.size(48.dp)
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = title,
-            fontFamily = UrduFontFamily,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = message,
-            fontFamily = UrduFontFamily,
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.outline,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier.padding(top = 4.dp)
-        )
+        Column(
+            modifier = Modifier.padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF201B34))
+                    .border(1.dp, GoldAccent.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                    .padding(6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = novel.title,
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                    color = GoldAccent,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = novel.title,
+                fontFamily = UrduFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Surface(
+                shape = CircleShape,
+                color = Color(0xFF1B152A),
+                border = androidx.compose.foundation.BorderStroke(0.6.dp, GoldAccent),
+                modifier = Modifier.padding(top = 2.dp)
+            ) {
+                Text(
+                    text = if (novel.readingProgress > 0f) "Read ${(novel.readingProgress * 100).toInt()}%" else "Read",
+                    fontSize = 9.sp,
+                    color = GoldAccent,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                )
+            }
+        }
     }
 }

@@ -159,6 +159,10 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
         _screenState.value = ScreenState.NovelDetail(novelId)
     }
 
+    fun navigateToAuthorDetail(authorId: String) {
+        _screenState.value = ScreenState.AuthorDetail(authorId)
+    }
+
     fun navigateToReader(novelId: String, chapterId: String? = null, initialCharOffset: Int = 0) {
         if (chapterId != null) {
             _screenState.value = ScreenState.Reader(novelId, chapterId, initialCharOffset)

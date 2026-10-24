@@ -87,12 +87,22 @@ fun AuthorCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        Text(
-            text = "${author.totalNovelsCount} ناولز",
-            fontFamily = UrduFontFamily,
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.outline,
-            textAlign = TextAlign.Center
-        )
+        Spacer(modifier = Modifier.height(3.dp))
+
+        // "فالو" Pill Button matching reference UI screen 1
+        androidx.compose.material3.Surface(
+            shape = CircleShape,
+            color = GoldAccent,
+            modifier = Modifier.clickable(onClick = onClick)
+        ) {
+            Text(
+                text = "فالو",
+                fontFamily = UrduFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp,
+                color = Color(0xFF1B1500),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)
+            )
+        }
     }
 }

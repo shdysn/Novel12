@@ -2,27 +2,30 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Royal Emerald and Antique Gold palette for Urdu Novel Reader
-val EmeraldPrimary = Color(0xFF1B5E48)
-val EmeraldDark = Color(0xFF0F3B2E)
-val EmeraldContainer = Color(0xFFD2E8DD)
-val OnEmeraldContainer = Color(0xFF052118)
+// Luxury Midnight Purple & Royal Amber Gold Palette (Matching Reference UI Design)
+val MidnightDarkBg = Color(0xFF13101E)
+val MidnightDarkSurface = Color(0xFF1E1B2E)
+val MidnightDarkSurfaceElevated = Color(0xFF282343)
+val MidnightDarkCard = Color(0xFF282343)
+val MidnightDarkCardElevated = Color(0xFF332C54)
+val MidnightDarkBorder = Color(0xFF423A69)
 
-val GoldAccent = Color(0xFFD4AF37)
-val GoldDark = Color(0xFFB89025)
-val GoldContainer = Color(0xFFFFF3D4)
-val OnGoldContainer = Color(0xFF3B2D05)
+val GoldAccent = Color(0xFFFFC107)
+val GoldDark = Color(0xFFD4AF37)
+val GoldLight = Color(0xFFFFE082)
+val GoldContainer = Color(0xFF3C3110)
+val OnGoldContainer = Color(0xFFFFECB3)
 
-val SurfaceWarmLight = Color(0xFFFCFAF7)
-val BackgroundWarmLight = Color(0xFFF7F4EE)
-val CardBackgroundLight = Color(0xFFFFFFFF)
+// Secondary & Status Colors
+val EmeraldPrimary = Color(0xFF2E7D32)
+val EmeraldDark = Color(0xFF1B5E20)
+val EmeraldContainer = Color(0xFF1B3B2B)
+val OnEmeraldContainer = Color(0xFFA5D6A7)
 
-// Dark Theme Colors
-val EmeraldDarkPrimary = Color(0xFF72D7AF)
-val EmeraldDarkSurface = Color(0xFF131A17)
-val EmeraldDarkBackground = Color(0xFF0B100E)
-val EmeraldDarkCard = Color(0xFF1A2420)
-val GoldDarkAccent = Color(0xFFE5C365)
+// Text Colors
+val TextWhitePrimary = Color(0xFFFFFFFF)
+val TextMutedPurple = Color(0xFFB8B2D1)
+val TextDarkPrimary = Color(0xFF1C1B1F)
 
 // Reader Specific Themes
 val ReaderPaperBg = Color(0xFFFBF8F1)
@@ -31,11 +34,12 @@ val ReaderPaperText = Color(0xFF26201A)
 val ReaderSepiaBg = Color(0xFFF4ECD8)
 val ReaderSepiaText = Color(0xFF3D2E1E)
 
-val ReaderNightBg = Color(0xFF181B1E)
-val ReaderNightText = Color(0xFFE0E4E8)
+val ReaderNightBg = Color(0xFF1E1B2E)
+val ReaderNightText = Color(0xFFE5E0F8)
 
-val ReaderOledBg = Color(0xFF000000)
-val ReaderOledText = Color(0xFFDCD6CD)
+val ReaderOledBg = Color(0xFF0C0A14)
+val ReaderOledText = Color(0xFFECE7FA)
 
-val ReaderEmeraldBg = Color(0xFF0C1F18)
-val ReaderEmeraldText = Color(0xFFCEE3D8)
+val ReaderEmeraldBg = Color(0xFF11221B)
+val ReaderEmeraldText = Color(0xFFD0E8DC)
+

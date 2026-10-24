@@ -18,11 +18,13 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalLibrary
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.components.AdminPasscodeDialog
+import com.example.ui.screens.AuthorProfileScreen
 import com.example.ui.screens.CategoriesScreen
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.LibraryScreen
@@ -61,6 +64,7 @@ import com.example.ui.screens.ProfileScreen
 import com.example.ui.screens.PublisherScreen
 import com.example.ui.screens.ReaderScreen
 import com.example.ui.screens.SearchScreen
+import com.example.ui.screens.SettingsScreen
 import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.UrduNovelReaderTheme
@@ -113,8 +117,8 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
             // Only show bottom navigation when on Main screen (tabs), hide during NovelDetail or Reader
             if (screenState is ScreenState.Main) {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 6.dp,
+                    containerColor = com.example.ui.theme.MidnightDarkSurface,
+                    tonalElevation = 8.dp,
                     modifier = Modifier
                         .windowInsetsPadding(WindowInsets.navigationBars)
                         .testTag("main_navigation_bar")
@@ -138,9 +142,11 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = EmeraldPrimary,
-                            selectedTextColor = EmeraldPrimary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedIconColor = GoldAccent,
+                            selectedTextColor = GoldAccent,
+                            unselectedIconColor = com.example.ui.theme.TextMutedPurple,
+                            unselectedTextColor = com.example.ui.theme.TextMutedPurple,
+                            indicatorColor = com.example.ui.theme.GoldContainer
                         ),
                         modifier = Modifier.testTag("nav_home")
                     )
@@ -164,9 +170,11 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = EmeraldPrimary,
-                            selectedTextColor = EmeraldPrimary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedIconColor = GoldAccent,
+                            selectedTextColor = GoldAccent,
+                            unselectedIconColor = com.example.ui.theme.TextMutedPurple,
+                            unselectedTextColor = com.example.ui.theme.TextMutedPurple,
+                            indicatorColor = com.example.ui.theme.GoldContainer
                         ),
                         modifier = Modifier.testTag("nav_categories")
                     )
@@ -190,9 +198,11 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = EmeraldPrimary,
-                            selectedTextColor = EmeraldPrimary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedIconColor = GoldAccent,
+                            selectedTextColor = GoldAccent,
+                            unselectedIconColor = com.example.ui.theme.TextMutedPurple,
+                            unselectedTextColor = com.example.ui.theme.TextMutedPurple,
+                            indicatorColor = com.example.ui.theme.GoldContainer
                         ),
                         modifier = Modifier.testTag("nav_search")
                     )
@@ -216,9 +226,11 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = EmeraldPrimary,
-                            selectedTextColor = EmeraldPrimary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedIconColor = GoldAccent,
+                            selectedTextColor = GoldAccent,
+                            unselectedIconColor = com.example.ui.theme.TextMutedPurple,
+                            unselectedTextColor = com.example.ui.theme.TextMutedPurple,
+                            indicatorColor = com.example.ui.theme.GoldContainer
                         ),
                         modifier = Modifier.testTag("nav_library")
                     )
@@ -229,24 +241,26 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         onClick = { viewModel.selectTab(4) },
                         icon = {
                             Icon(
-                                imageVector = if (selectedTab == 4) Icons.Filled.Person else Icons.Outlined.Person,
-                                contentDescription = "پروفائل"
+                                imageVector = if (selectedTab == 4) Icons.Filled.Settings else Icons.Outlined.Settings,
+                                contentDescription = "سیٹنگز"
                             )
                         },
                         label = {
                             Text(
-                                text = "پروفائل",
+                                text = "سیٹنگز",
                                 fontFamily = UrduFontFamily,
                                 fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 11.sp
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = EmeraldPrimary,
-                            selectedTextColor = EmeraldPrimary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            selectedIconColor = GoldAccent,
+                            selectedTextColor = GoldAccent,
+                            unselectedIconColor = com.example.ui.theme.TextMutedPurple,
+                            unselectedTextColor = com.example.ui.theme.TextMutedPurple,
+                            indicatorColor = com.example.ui.theme.GoldContainer
                         ),
-                        modifier = Modifier.testTag("nav_profile")
+                        modifier = Modifier.testTag("nav_settings")
                     )
                 }
             }
@@ -265,16 +279,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                             1 -> CategoriesScreen(viewModel = viewModel)
                             2 -> SearchScreen(viewModel = viewModel)
                             3 -> LibraryScreen(viewModel = viewModel)
-                            4 -> ProfileScreen(
-                                viewModel = viewModel,
-                                onOpenPublisher = {
-                                    if (isAdminUnlocked) {
-                                        showPublisherSheet = true
-                                    } else {
-                                        showAdminPasscodeDialog = true
-                                    }
-                                }
-                            )
+                            4 -> SettingsScreen(viewModel = viewModel)
                         }
                     }
                     is ScreenState.NovelDetail -> {
@@ -289,8 +294,7 @@ fun MainAppScaffold(viewModel: NovelViewModel) {
                         )
                     }
                     is ScreenState.AuthorDetail -> {
-                        // Handled via author filtered novels
-                        CategoriesScreen(viewModel = viewModel)
+                        AuthorProfileScreen(authorId = state.authorId, viewModel = viewModel)
                     }
                 }
             }

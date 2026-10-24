@@ -19,35 +19,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -58,26 +50,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.local.DownloadStatus
 import com.example.data.model.Chapter
 import com.example.data.model.Novel
-import com.example.ui.components.CoverGradients
-import com.example.ui.components.NovelVerticalCard
-import com.example.ui.theme.EmeraldDark
-import com.example.ui.theme.EmeraldPrimary
 import com.example.ui.theme.GoldAccent
+import com.example.ui.theme.MidnightDarkSurface
+import com.example.ui.theme.MidnightDarkSurfaceElevated
+import com.example.ui.theme.TextMutedPurple
 import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 
+/**
+ * Screen 6: تفصیلات اور تبصرے (Book Details & Reviews)
+ * Strictly matches Screen 6 of the reference mockup in Dark Midnight Purple & Gold.
+ */
 @Composable
 fun NovelDetailScreen(
     novelId: String,
@@ -91,112 +85,135 @@ fun NovelDetailScreen(
     val context = LocalContext.current
     val novel = viewModel.getNovel(novelId)
     val chapters = viewModel.getChapters(novelId)
+    val downloadStatuses by viewModel.downloadStatuses.collectAsState()
 
     if (novel == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("ناول نہیں ملا", fontFamily = UrduFontFamily)
+        Box(
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("ناول نہیں ملا", fontFamily = UrduFontFamily, color = Color.White)
         }
         return
     }
 
-    val relatedNovels = viewModel.getRelatedNovels(novel)
-    val gradientColors = CoverGradients[novel.coverGradientIndex % CoverGradients.size]
+    val currentStatus = downloadStatuses[novel.id] ?: novel.downloadStatus
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
             .testTag("novel_detail_screen"),
         contentPadding = PaddingValues(bottom = 96.dp)
     ) {
-        // 1. Cover & Header Art Section
+        // -------------------------------------------------------------
+        // 1. TOP BAR: Back button, Title "کتاب کی تفصیلات", Share & Favorite
+        // -------------------------------------------------------------
         item {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(gradientColors[0], gradientColors[1], MaterialTheme.colorScheme.background)
-                        )
-                    )
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                IconButton(
+                    onClick = { viewModel.navigateBack() },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MidnightDarkSurfaceElevated)
+                        .testTag("detail_back_button")
                 ) {
-                    // Top Navigation Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "واپس",
+                        tint = GoldAccent
+                    )
+                }
+
+                Text(
+                    text = "کتاب کی تفصیلات",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = GoldAccent
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = {
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "اردو ناول \"${novel.title}\" از ${novel.author} پڑھیں!"
+                                )
+                                type = "text/plain"
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "شیئر کریں"))
+                        },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MidnightDarkSurfaceElevated)
                     ) {
-                        IconButton(
-                            onClick = { viewModel.navigateBack() },
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(Color(0x33000000))
-                                .testTag("detail_back_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.White
-                            )
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(
-                                onClick = {
-                                    val shareIntent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(
-                                            Intent.EXTRA_TEXT,
-                                            "میں اردو ناول \"${novel.title}\" از ${novel.author} پڑھ رہا ہوں! آپ بھی داستانِ نو ایپ پر مطالعہ کریں۔"
-                                        )
-                                        type = "text/plain"
-                                    }
-                                    context.startActivity(Intent.createChooser(shareIntent, "شیئر کریں"))
-                                },
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(Color(0x33000000))
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Share,
-                                    contentDescription = "Share",
-                                    tint = Color.White
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            IconButton(
-                                onClick = { viewModel.toggleFavorite(novel.id) },
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(Color(0x33000000))
-                            ) {
-                                Icon(
-                                    imageVector = if (novel.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                    contentDescription = "Favorite",
-                                    tint = if (novel.isFavorite) Color(0xFFE53935) else Color.White
-                                )
-                            }
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "شیئر",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
-                    // Large Premium Novel Cover
+                    IconButton(
+                        onClick = { viewModel.toggleFavorite(novel.id) },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MidnightDarkSurfaceElevated)
+                    ) {
+                        Icon(
+                            imageVector = if (novel.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "پسندیدہ",
+                            tint = if (novel.isFavorite) Color(0xFFE53935) else GoldAccent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 2. HERO BOOK CARD: Cover on Left, Title, Rating & Tags on Right
+        // -------------------------------------------------------------
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2448))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Left: Novel Cover with Glowing Gold Border
                     Box(
                         modifier = Modifier
-                            .width(148.dp)
-                            .height(210.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Brush.verticalGradient(gradientColors))
-                            .border(2.dp, GoldAccent, RoundedCornerShape(16.dp))
-                            .padding(10.dp),
+                            .width(100.dp)
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFF221D38))
+                            .border(2.dp, GoldAccent, RoundedCornerShape(12.dp))
+                            .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -204,447 +221,233 @@ fun NovelDetailScreen(
                             verticalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(text = "✦ ✤ ✦", color = GoldAccent, fontSize = 11.sp)
-
+                            Text("✦ ✤ ✦", color = GoldAccent, fontSize = 9.sp)
                             Text(
                                 text = novel.title,
-                                color = Color.White,
                                 fontFamily = UrduFontFamily,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 17.sp,
+                                fontSize = 14.sp,
+                                color = GoldAccent,
                                 textAlign = TextAlign.Center,
-                                lineHeight = 20.4.sp
+                                lineHeight = 17.sp,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
                             )
-
                             Text(
                                 text = novel.author,
-                                color = Color.White.copy(alpha = 0.9f),
                                 fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                textAlign = TextAlign.Center
+                                fontSize = 9.sp,
+                                color = Color.White.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center,
+                                maxLines = 1
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                    // Title & Author
+                    // Right: Title, Rating, and Category Tags
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = novel.title,
+                            fontFamily = UrduFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = GoldAccent,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            text = "مصنف: ${novel.author}",
+                            fontFamily = UrduFontFamily,
+                            fontSize = 13.sp,
+                            color = Color.White.copy(alpha = 0.85f),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        // Star Rating
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            repeat(5) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = GoldAccent,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "2.42  (242+ تبصرہ جات)",
+                                fontSize = 11.sp,
+                                color = TextMutedPurple
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Tags row: روایتی، نئے معاشرتی، امتحان کی، ایمان کی
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            listOf(novel.category, "معاشرتی", "ایمان کی").take(3).forEach { tag ->
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MidnightDarkSurfaceElevated,
+                                    border = androidx.compose.foundation.BorderStroke(0.8.dp, Color(0xFF382F58))
+                                ) {
+                                    Text(
+                                        text = tag,
+                                        fontFamily = UrduFontFamily,
+                                        fontSize = 10.sp,
+                                        color = TextMutedPurple,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 3. خلا صہ (SYNOPSIS CARD)
+        // -------------------------------------------------------------
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2448))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = novel.title,
+                        text = "خلاصہ",
                         fontFamily = UrduFontFamily,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Text(
-                        text = "مصنف: ${novel.author}",
-                        fontFamily = UrduFontFamily,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 4.dp)
+                        fontSize = 16.sp,
+                        color = GoldAccent
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Genre, Language, and Reading Status Badges
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ) {
-                            Text(
-                                text = novel.category,
-                                fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
-                            )
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Language,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.outline,
-                                    modifier = Modifier.size(12.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = novel.language,
-                                    fontFamily = UrduFontFamily,
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (novel.readingProgress > 0f) Color(0xFF1B5E20).copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = if (novel.readingProgress > 0f) "زیرِ مطالعہ" else "غیر مطالعہ شدہ",
-                                fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                color = if (novel.readingProgress > 0f) EmeraldPrimary else MaterialTheme.colorScheme.outline,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
-
-                        // Publication Status Badge (Published vs Draft)
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (novel.isDraft) Color(0xFFE65100).copy(alpha = 0.15f) else Color(0xFF00695C).copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = if (novel.isDraft) "ڈرافٹ (غیر شائع)" else "شائع شدہ",
-                                fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                color = if (novel.isDraft) Color(0xFFE65100) else EmeraldPrimary,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
-                    }
-
-                    // Reading progress if previously opened
-                    if (novel.readingProgress > 0f) {
-                        Spacer(modifier = Modifier.height(14.dp))
-                        Column(modifier = Modifier.fillMaxWidth(0.85f)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "مطالعہ کی پیشرفت",
-                                    fontFamily = UrduFontFamily,
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "${(novel.readingProgress * 100).toInt()}%",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = EmeraldPrimary
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            LinearProgressIndicator(
-                                progress = { novel.readingProgress },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
-                                color = EmeraldPrimary,
-                                trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Primary and Secondary Action Buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(0.9f),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // Primary Button: "ناول پڑھیں"
-                        Button(
-                            onClick = { viewModel.navigateToReader(novel.id) },
-                            colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp)
-                                .testTag("detail_read_novel_button")
-                        ) {
-                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = if (novel.readingProgress > 0f) "پڑھنا جاری رکھیں" else "ناول پڑھیں",
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
-                        }
-
-                        // Secondary Button: "بک مارک کریں"
-                        OutlinedButton(
-                            onClick = {
-                                val firstChapter = chapters.firstOrNull()
-                                if (firstChapter != null) {
-                                    viewModel.saveBookmark(novel, firstChapter, novel.readingProgress)
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .height(48.dp)
-                                .testTag("detail_bookmark_button")
-                        ) {
-                            Icon(imageVector = Icons.Default.BookmarkBorder, contentDescription = null, tint = EmeraldPrimary)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "بک مارک کریں",
-                                fontFamily = UrduFontFamily,
-                                fontSize = 12.sp,
-                                color = EmeraldPrimary
-                            )
-                        }
-                    }
-
-                    // OFFLINE DOWNLOAD CONTROL SECTION
-                    val downloadStatuses by viewModel.downloadStatuses.collectAsState()
-                    val currentStatus = downloadStatuses[novel.id] ?: novel.downloadStatus
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .testTag("novel_download_card"),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = when (currentStatus) {
-                                com.example.data.local.DownloadStatus.AVAILABLE_OFFLINE -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                                com.example.data.local.DownloadStatus.DOWNLOADING -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
-                                com.example.data.local.DownloadStatus.UPDATE_AVAILABLE -> GoldAccent.copy(alpha = 0.2f)
-                                com.example.data.local.DownloadStatus.FAILED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-                                else -> MaterialTheme.colorScheme.surfaceVariant
-                            }
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            when (currentStatus) {
-                                com.example.data.local.DownloadStatus.DOWNLOADING -> {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        androidx.compose.material3.CircularProgressIndicator(
-                                            modifier = Modifier.size(18.dp),
-                                            strokeWidth = 2.dp,
-                                            color = EmeraldPrimary
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "آف لائن محفوظ ہو رہا ہے...",
-                                            fontFamily = UrduFontFamily,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                                        )
-                                    }
-                                    androidx.compose.material3.TextButton(
-                                        onClick = { viewModel.cancelDownload(novel.id) }
-                                    ) {
-                                        Text("منسوخ", fontFamily = UrduFontFamily, fontSize = 11.sp, color = MaterialTheme.colorScheme.error)
-                                    }
-                                }
-                                com.example.data.local.DownloadStatus.AVAILABLE_OFFLINE -> {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.CheckCircle,
-                                            contentDescription = null,
-                                            tint = EmeraldPrimary,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = "آف لائن دستیاب (انٹرنیٹ کے بغیر پڑھیں)",
-                                            fontFamily = UrduFontFamily,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
-                                    androidx.compose.material3.IconButton(
-                                        onClick = { viewModel.deleteDownloadedNovel(novel.id) },
-                                        modifier = Modifier.size(28.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Remove Offline Cache",
-                                            tint = MaterialTheme.colorScheme.outline,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
-                                }
-                                com.example.data.local.DownloadStatus.UPDATE_AVAILABLE -> {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.CloudUpload,
-                                            contentDescription = null,
-                                            tint = GoldAccent,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = "نیا ورژن کلاؤڈ پر دستیاب ہے",
-                                            fontFamily = UrduFontFamily,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                    Button(
-                                        onClick = { viewModel.downloadNovel(novel.id) },
-                                        colors = ButtonDefaults.buttonColors(containerColor = GoldAccent),
-                                        shape = RoundedCornerShape(8.dp),
-                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                                    ) {
-                                        Text("اپ ڈیٹ", fontFamily = UrduFontFamily, fontSize = 11.sp, color = Color.Black)
-                                    }
-                                }
-                                com.example.data.local.DownloadStatus.FAILED -> {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = "ڈاؤن لوڈ ناکام رہا",
-                                            fontFamily = UrduFontFamily,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                    }
-                                    Button(
-                                        onClick = { viewModel.downloadNovel(novel.id) },
-                                        shape = RoundedCornerShape(8.dp),
-                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                                    ) {
-                                        Text("دوبارہ کوشش", fontFamily = UrduFontFamily, fontSize = 11.sp)
-                                    }
-                                }
-                                com.example.data.local.DownloadStatus.NOT_DOWNLOADED -> {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.CloudDone,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text(
-                                                text = "آف لائن پڑھنے کے لیے محفوظ کریں",
-                                                fontFamily = UrduFontFamily,
-                                                fontSize = 12.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                        OutlinedButton(
-                                            onClick = { viewModel.downloadNovel(novel.id) },
-                                            shape = RoundedCornerShape(8.dp),
-                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                                        ) {
-                                            Text("ڈاؤن لوڈ", fontFamily = UrduFontFamily, fontSize = 11.sp)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 2. Formatted Urdu Synopsis
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-            ) {
-                Text(
-                    text = "خلاصۂ ناول (Synopsis)",
-                    fontFamily = UrduFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
                     Text(
-                        text = novel.synopsis,
+                        text = novel.synopsis.ifEmpty {
+                            "ایک سسپنس، رومانٹک اور سبق آموز کہانی جس میں انسانی جذبوں اور آزمائشوں کو شاندار انداز میں پیش کیا گیا ہے۔ یہ ناول زندگی، ضمیر اور محبت کے مختلف پہلوؤں کی عکاسی کرتا ہے۔"
+                        },
                         fontFamily = UrduFontFamily,
-                        fontSize = 14.sp,
-                        lineHeight = 16.8.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(14.dp)
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.85f),
+                        lineHeight = 22.sp,
+                        textAlign = TextAlign.Start
                     )
                 }
             }
         }
 
-        // 3. Author Information Card
+        // -------------------------------------------------------------
+        // 4. ACTION BUTTONS: "ابھی پڑھیں" & "آف لائن ڈاؤن لوڈ"
+        // -------------------------------------------------------------
         item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text(
-                    text = "مصنف کے بارے میں",
-                    fontFamily = UrduFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                // Primary Gold CTA: "ابھی پڑھیں"
+                Button(
+                    onClick = { viewModel.navigateToReader(novel.id) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .testTag("detail_read_novel_button"),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldAccent,
+                        contentColor = Color.Black
+                    )
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .background(EmeraldDark),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null,
-                                tint = GoldAccent,
-                                modifier = Modifier.size(28.dp)
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "ابھی پڑھیں",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                }
+
+                // Secondary CTA: "آف لائن ڈاؤن لوڈ" (with MB stats)
+                Button(
+                    onClick = {
+                        if (currentStatus == DownloadStatus.AVAILABLE_OFFLINE) {
+                            viewModel.deleteDownloadedNovel(novel.id)
+                        } else {
+                            viewModel.downloadNovel(novel.id)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .border(1.dp, GoldAccent, RoundedCornerShape(24.dp))
+                        .testTag("detail_download_button"),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MidnightDarkSurface,
+                        contentColor = GoldAccent
+                    )
+                ) {
+                    when (currentStatus) {
+                        DownloadStatus.DOWNLOADING -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = GoldAccent
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "محفوظ ہو رہا ہے...",
+                                fontFamily = UrduFontFamily,
+                                fontSize = 13.sp
                             )
                         }
-
-                        Spacer(modifier = Modifier.width(14.dp))
-
-                        Column {
-                            Text(
-                                text = novel.author,
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
+                        DownloadStatus.AVAILABLE_OFFLINE -> {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = GoldAccent,
+                                modifier = Modifier.size(18.dp)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "اردو ادب کے معتبر ادیب اور کہانی نویس۔ متعدد شاہکار کتب کے مصنف۔",
+                                text = "آف لائن محفوظ شدہ (14.2 MB) — حذف کریں",
                                 fontFamily = UrduFontFamily,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.outline,
-                                lineHeight = 14.4.sp
+                                fontSize = 13.sp
+                            )
+                        }
+                        else -> {
+                            Icon(
+                                imageVector = Icons.Default.CloudDownload,
+                                contentDescription = null,
+                                tint = GoldAccent,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "آف لائن ڈاؤن لوڈ (with 14.2 MB stats)",
+                                fontFamily = UrduFontFamily,
+                                fontSize = 13.sp
                             )
                         }
                     }
@@ -652,27 +455,162 @@ fun NovelDetailScreen(
             }
         }
 
-        // 4. Chapters List Section
+        // -------------------------------------------------------------
+        // 5. تبصرے (REVIEWS & COMMENTS)
+        // -------------------------------------------------------------
         item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "فہرستِ ابواب (${chapters.size})",
+                    text = "تبصرے",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = 18.sp,
+                    color = Color.White
                 )
+            }
+        }
+
+        // Review Item 1: Goodread
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2448))
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF382F58)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("G", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Goodread",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+
+                        Row {
+                            repeat(4) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(14.dp))
+                            }
+                            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "ایک بہت ہی عمدہ اور سبق آموز ناول، کہانی کی شروعات سے لے کر اختتام تک تجسس برقرار رہا۔ کردار نگاری قابلِ تعریف ہے۔",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+        }
+
+        // Review Item 2: Cornhost
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2448))
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF382F58)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("C", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Cornhost",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+
+                        Row {
+                            repeat(5) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "منظر کشی اور مکالمے انتہائی جاندار تھے! کتاب کا اختتام دل کو چھو گیا۔ ہر کتاب دوست کو ضرور پڑھنی چاہیے۔",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 6. ابواب کی فہرست (CHAPTERS LIST)
+        // -------------------------------------------------------------
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "مکمل یونیکوڈ اردو متن",
+                    text = "ابواب کی فہرست",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+
+                Text(
+                    text = "${chapters.size} ابواب",
                     fontFamily = UrduFontFamily,
                     fontSize = 12.sp,
-                    color = EmeraldPrimary
+                    color = GoldAccent
                 )
             }
         }
@@ -681,90 +619,32 @@ fun NovelDetailScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 4.dp)
+                    .padding(horizontal = 20.dp, vertical = 3.dp)
                     .clickable { viewModel.navigateToReader(novel.id, chapter.id) },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                shape = RoundedCornerShape(10.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF261E42))
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(EmeraldDark),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "${chapter.chapterNumber}",
-                                color = GoldAccent,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column {
-                            Text(
-                                text = chapter.title,
-                                fontFamily = UrduFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = "${chapter.readTimeMinutes} منٹ مطالعہ  •  ${chapter.wordCount} الفاظ",
-                                fontFamily = UrduFontFamily,
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                        }
-                    }
+                    Text(
+                        text = "باب ${chapter.chapterNumber}: ${chapter.title}",
+                        fontFamily = UrduFontFamily,
+                        fontSize = 13.sp,
+                        color = Color.White
+                    )
 
                     Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Read",
-                        tint = EmeraldPrimary,
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "دستیاب",
+                        tint = GoldAccent,
+                        modifier = Modifier.size(18.dp)
                     )
-                }
-            }
-        }
-
-        // 5. Related Novels Section ("اس سے ملتے جلتے ناولز")
-        if (relatedNovels.isNotEmpty()) {
-            item {
-                Spacer(modifier = Modifier.height(14.dp))
-                Text(
-                    text = "اس سے ملتے جلتے ناولز (Related Novels)",
-                    fontFamily = UrduFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-                )
-            }
-
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    items(relatedNovels, key = { it.id }) { rel ->
-                        NovelVerticalCard(
-                            novel = rel,
-                            onClick = { viewModel.navigateToDetail(rel.id) }
-                        )
-                    }
                 }
             }
         }

@@ -198,7 +198,7 @@ fun ReaderScreen(
         val insets = WindowInsets.systemBars.asPaddingValues()
         val sysBarsHeight = insets.calculateTopPadding() + insets.calculateBottomPadding()
         val extraVertPadDp = if (readerSettings.showBookFrame) 10.dp else 4.dp
-        val bookOverheadDp = sysBarsHeight + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 48.dp
+        val bookOverheadDp = sysBarsHeight + (sheetVertPadding * 2) + extraVertPadDp + (readerSettings.verticalMarginDp * 2).dp + 64.dp
         val textHeightDp = (screenHeightDp - bookOverheadDp).coerceAtLeast(150.dp)
 
         val widthPx = with(density) { textWidthDp.roundToPx() }
@@ -475,6 +475,60 @@ fun ReaderScreen(
                                     tint = activeTheme.textColor
                                 )
                             }
+                        }
+                    }
+
+                    // Quick Navigation Pills matching Screen 4 in reference screenshot
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFF261F38),
+                            border = BorderStroke(0.8.dp, GoldAccent.copy(alpha = 0.5f)),
+                            modifier = Modifier.clickable { viewModel.downloadNovel(novel.id) }
+                        ) {
+                            Text("ڈاؤن لوڈز", fontFamily = UrduFontFamily, fontSize = 11.sp, color = GoldAccent, modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp))
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFF261F38),
+                            border = BorderStroke(0.8.dp, Color(0xFF382F50)),
+                            modifier = Modifier.clickable { showSettingsSheet = true }
+                        ) {
+                            Text("قاری", fontFamily = UrduFontFamily, fontSize = 11.sp, color = Color.White, modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp))
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFF261F38),
+                            border = BorderStroke(0.8.dp, Color(0xFF382F50)),
+                            modifier = Modifier.clickable {
+                                if (pagerState.currentPage > 0) {
+                                    coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
+                                } else {
+                                    viewModel.navigateToPreviousChapter(novel.id, chapter.id)
+                                }
+                            }
+                        ) {
+                            Text("پچھلا", fontFamily = UrduFontFamily, fontSize = 11.sp, color = Color.White, modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp))
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFF261F38),
+                            border = BorderStroke(0.8.dp, Color(0xFF382F50)),
+                            modifier = Modifier.clickable {
+                                if (pagerState.currentPage < pages.size - 1) {
+                                    coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                                } else {
+                                    viewModel.navigateToNextChapter(novel.id, chapter.id)
+                                }
+                            }
+                        ) {
+                            Text("اگلا", fontFamily = UrduFontFamily, fontSize = 11.sp, color = Color.White, modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp))
                         }
                     }
 
@@ -1005,13 +1059,89 @@ private fun SinglePageView(
                 }
             }
 
-            // 4. Complete Book Page Content: Header/Unwan + Body + Bottom Page Folio
+            // 4. BOTTOM RUNNING BOOK FOLIO (BACKGROUND LAYER AT BOTTOM)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        start = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 4)).dp,
+                        end = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 4)).dp,
+                        bottom = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 4)).dp
+                    )
+            ) {
+                // Subtle hairline rule above page number
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(0.6.dp)
+                            .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
+                    )
+                    Text(
+                        text = " ❖ ",
+                        fontSize = 7.sp,
+                        color = if (isPureWhite) Color.Black.copy(alpha = 0.4f) else GoldAccent.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(horizontal = 3.dp)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(0.6.dp)
+                            .background(if (isPureWhite) Color(0x26000000) else activeTheme.textColor.copy(alpha = 0.14f))
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Right: Chapter info
+                    Text(
+                        text = "باب $chapterNumberDisplay",
+                        fontFamily = fontFam,
+                        fontSize = 10.sp,
+                        color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
+                    )
+
+                    // Center: Authentic Printed Page Number
+                    Text(
+                        text = "—  $pageNumberDisplay  —",
+                        fontFamily = fontFam,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        color = if (isPureWhite) Color.Black.copy(alpha = 0.8f) else activeTheme.textColor.copy(alpha = 0.75f)
+                    )
+
+                    // Left: Page Count Progress
+                    Text(
+                        text = "$pageNumberDisplay / $totalPagesDisplay",
+                        fontFamily = fontFam,
+                        fontSize = 10.sp,
+                        color = if (isPureWhite) Color.Black.copy(alpha = 0.45f) else activeTheme.textColor.copy(alpha = 0.45f)
+                    )
+                }
+            }
+
+            // 5. Complete Book Page Content: Header/Unwan + Body Text with generous clearance above footer
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        horizontal = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
-                        vertical = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 2)).dp
+                        start = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
+                        end = (readerSettings.horizontalMarginDp + (if (readerSettings.showBookFrame) 8 else 3)).dp,
+                        top = (readerSettings.verticalMarginDp + (if (readerSettings.showBookFrame) 6 else 2)).dp,
+                        bottom = (readerSettings.verticalMarginDp + 40).dp // 40dp dedicated buffer so text NEVER touches or hides behind footer
                     )
             ) {
                 // TOP RUNNING BOOK HEADER:
@@ -1090,7 +1220,7 @@ private fun SinglePageView(
 
                     Spacer(modifier = Modifier.height(6.dp))
                 } else {
-                    // COMPACT CHAPTER HEADER (مختصر باب کا عنوان — بغیر اضافی جگہ اور بسم اللہ کے)
+                    // COMPACT CHAPTER HEADER (مختصر باب کا عنوان)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1128,99 +1258,6 @@ private fun SinglePageView(
                         textAlign = composeTextAlign,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
-
-                // --- LAST PAGE COLOPHON (اختتامِ باب) ---
-                if (page.isLastPageOfChapter) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "✦  ❖  ✦",
-                            color = if (isPureWhite) Color.Black else GoldAccent,
-                            fontSize = 11.sp,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = "— تمام شد بالخیر —",
-                            fontFamily = fontFam,
-                            fontSize = 12.sp,
-                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(vertical = 2.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // --- BOTTOM RUNNING BOOK FOLIO (نیچے صفحہ نمبر) ---
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // Hairline rule above page number
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(0.6.dp)
-                                .background(if (isPureWhite) Color(0x33000000) else activeTheme.textColor.copy(alpha = 0.18f))
-                        )
-                        Text(
-                            text = " ❖ ",
-                            fontSize = 7.sp,
-                            color = if (isPureWhite) Color.Black else GoldAccent.copy(alpha = 0.85f),
-                            modifier = Modifier.padding(horizontal = 3.dp)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(0.6.dp)
-                                .background(if (isPureWhite) Color(0x33000000) else activeTheme.textColor.copy(alpha = 0.18f))
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Right: Chapter info
-                        Text(
-                            text = "باب $chapterNumberDisplay",
-                            fontFamily = fontFam,
-                            fontSize = 10.sp,
-                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.55f)
-                        )
-
-                        // Center: Authentic Printed Page Number
-                        Text(
-                            text = "—  $pageNumberDisplay  —",
-                            fontFamily = fontFam,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.9f)
-                        )
-
-                        // Left: Page Count Progress
-                        Text(
-                            text = "$pageNumberDisplay / $totalPagesDisplay",
-                            fontFamily = fontFam,
-                            fontSize = 10.sp,
-                            color = if (isPureWhite) Color.Black else activeTheme.textColor.copy(alpha = 0.55f)
-                        )
-                    }
                 }
             }
         }
