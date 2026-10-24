@@ -43,7 +43,9 @@ val AuthorGradients = listOf(
 fun AuthorCard(
     author: Author,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFollowing: Boolean = false,
+    onFollowClick: () -> Unit = onClick
 ) {
     val gradientColors = AuthorGradients[author.avatarColorIndex % AuthorGradients.size]
 
@@ -60,7 +62,7 @@ fun AuthorCard(
                 .size(68.dp)
                 .clip(CircleShape)
                 .background(Brush.radialGradient(gradientColors))
-                .border(2.dp, GoldAccent, CircleShape),
+                .border(2.dp, if (isFollowing) GoldAccent else GoldAccent.copy(alpha = 0.7f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             // First character or initials of author name in artistic Urdu calligraphy
@@ -92,15 +94,18 @@ fun AuthorCard(
         // "فالو" Pill Button matching reference UI screen 1
         androidx.compose.material3.Surface(
             shape = CircleShape,
-            color = GoldAccent,
-            modifier = Modifier.clickable(onClick = onClick)
+            color = if (isFollowing) Color(0xFF2C1E38) else GoldAccent,
+            border = if (isFollowing) androidx.compose.foundation.BorderStroke(1.dp, GoldAccent) else null,
+            modifier = Modifier
+                .clickable(onClick = onFollowClick)
+                .testTag("follow_pill_${author.id}")
         ) {
             Text(
-                text = "فالو",
+                text = if (isFollowing) "فالوڈ ✓" else "فالو",
                 fontFamily = UrduFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp,
-                color = Color(0xFF1B1500),
+                color = if (isFollowing) GoldAccent else Color(0xFF1B1500),
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)
             )
         }

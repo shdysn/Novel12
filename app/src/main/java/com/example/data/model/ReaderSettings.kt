@@ -52,7 +52,9 @@ data class ReaderSettings(
     val brightness: Float = 0.85f,
     val autoBookmark: Boolean = true,
     val showBookFrame: Boolean = false,
-    val useUrduNumerals: Boolean = true
+    val useUrduNumerals: Boolean = true,
+    val autoScrollEnabled: Boolean = false,
+    val autoScrollSpeed: Float = 1.0f
 )
 
 /**

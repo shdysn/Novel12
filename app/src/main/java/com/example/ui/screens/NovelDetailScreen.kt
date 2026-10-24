@@ -41,12 +41,19 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.local.DownloadStatus
 import com.example.data.model.Chapter
 import com.example.data.model.Novel
+import com.example.data.model.NovelCategory
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.MidnightDarkSurface
 import com.example.ui.theme.MidnightDarkSurfaceElevated
@@ -86,6 +94,13 @@ fun NovelDetailScreen(
     val novel = viewModel.getNovel(novelId)
     val chapters = viewModel.getChapters(novelId)
     val downloadStatuses by viewModel.downloadStatuses.collectAsState()
+    val allReviews by viewModel.novelReviews.collectAsState()
+    val customReviews = allReviews[novelId] ?: emptyList()
+
+    var showAddReviewDialog by remember { mutableStateOf(false) }
+    var reviewerName by remember { mutableStateOf("") }
+    var reviewerComment by remember { mutableStateOf("") }
+    var reviewerRating by remember { mutableIntStateOf(5) }
 
     if (novel == null) {
         Box(
@@ -297,13 +312,17 @@ fun NovelDetailScreen(
                                 Surface(
                                     shape = RoundedCornerShape(6.dp),
                                     color = MidnightDarkSurfaceElevated,
-                                    border = androidx.compose.foundation.BorderStroke(0.8.dp, Color(0xFF382F58))
+                                    border = androidx.compose.foundation.BorderStroke(0.8.dp, Color(0xFF382F58)),
+                                    modifier = Modifier.clickable {
+                                        viewModel.selectCategory(NovelCategory.fromUrdu(tag))
+                                        viewModel.selectTab(1)
+                                    }
                                 ) {
                                     Text(
                                         text = tag,
                                         fontFamily = UrduFontFamily,
                                         fontSize = 10.sp,
-                                        color = TextMutedPurple,
+                                        color = GoldAccent,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                                     )
                                 }
@@ -467,12 +486,89 @@ fun NovelDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "تبصرے",
+                    text = "تبصرے (${customReviews.size + 2})",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = Color.White
                 )
+
+                TextButton(
+                    onClick = { showAddReviewDialog = true },
+                    modifier = Modifier.testTag("add_review_button")
+                ) {
+                    Text(
+                        text = "+ تبصرہ لکھیں",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = GoldAccent
+                    )
+                }
+            }
+        }
+
+        // Custom User Reviews Added via Dialog
+        items(customReviews, key = { it.id }) { review ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MidnightDarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent.copy(alpha = 0.5f))
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(GoldAccent),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = review.userName.firstOrNull()?.toString() ?: "ق",
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = review.userName,
+                                fontFamily = UrduFontFamily,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = GoldAccent
+                            )
+                        }
+
+                        Row {
+                            repeat(review.rating) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(14.dp))
+                            }
+                            repeat(5 - review.rating) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = review.comment,
+                        fontFamily = UrduFontFamily,
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 18.sp
+                    )
+                }
             }
         }
 
@@ -648,5 +744,105 @@ fun NovelDetailScreen(
                 }
             }
         }
+    }
+
+    if (showAddReviewDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddReviewDialog = false },
+            containerColor = MidnightDarkSurface,
+            title = {
+                Text(
+                    text = "اپنا تبصرہ شامل کریں",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = GoldAccent
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedTextField(
+                        value = reviewerName,
+                        onValueChange = { reviewerName = it },
+                        label = { Text("آپ کا نام", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Star selection row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        (1..5).forEach { star ->
+                            IconButton(
+                                onClick = { reviewerRating = star },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "$star Stars",
+                                    tint = if (star <= reviewerRating) GoldAccent else Color.Gray,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    OutlinedTextField(
+                        value = reviewerComment,
+                        onValueChange = { reviewerComment = it },
+                        label = { Text("آپ کا تفصیلی تبصرہ", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        minLines = 3,
+                        maxLines = 5,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (reviewerComment.isNotBlank()) {
+                            viewModel.addNovelReview(
+                                novelId = novel.id,
+                                reviewerName = reviewerName.ifBlank { "قارئین" },
+                                rating = reviewerRating,
+                                comment = reviewerComment.trim()
+                            )
+                            reviewerComment = ""
+                            showAddReviewDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldAccent,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text("شائع کریں", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddReviewDialog = false }) {
+                    Text("منسوخ", fontFamily = UrduFontFamily, color = TextMutedPurple)
+                }
+            }
+        )
     }
 }

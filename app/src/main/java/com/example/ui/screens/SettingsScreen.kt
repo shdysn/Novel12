@@ -55,9 +55,15 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,13 +94,22 @@ fun SettingsScreen(
     viewModel: NovelViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var darkModeEnabled by remember { mutableStateOf(true) }
     var fontPrefEnabled by remember { mutableStateOf(true) }
     val notificationsEnabled by viewModel.repository.notificationsEnabled.collectAsState()
     val supabaseConfig by viewModel.supabaseConfig.collectAsState()
     val isSyncing by viewModel.isSyncing.collectAsState()
 
+    val userName by viewModel.userName.collectAsState()
+    val userTitle by viewModel.userTitle.collectAsState()
+    val userEmail by viewModel.userEmail.collectAsState()
+    val dailyGoalMinutes by viewModel.dailyGoalMinutes.collectAsState()
+
     var showSupabaseSheet by remember { mutableStateOf(false) }
+    var showAccountDialog by remember { mutableStateOf(false) }
+    var showAudioDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier
@@ -140,7 +155,7 @@ fun SettingsScreen(
                     titleUrdu = "اکاؤنٹ سیٹنگز",
                     subtitleEnglish = "Account Settings",
                     icon = Icons.Default.Person,
-                    onClick = { viewModel.showMessage("اکاؤنٹ سیٹنگز کھول دی گئیں") },
+                    onClick = { showAccountDialog = true },
                     trailingContent = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -258,7 +273,7 @@ fun SettingsScreen(
                     titleUrdu = "آڈیو اور اسپیچ",
                     subtitleEnglish = "Audio & Text-to-Speech Settings",
                     icon = Icons.Default.Headphones,
-                    onClick = { viewModel.showMessage("آڈیو اور ٹیکسٹ ٹو اسپیچ دستیاب ہے") },
+                    onClick = { showAudioDialog = true },
                     trailingContent = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -274,7 +289,17 @@ fun SettingsScreen(
                     titleUrdu = "مدد اور رابطہ",
                     subtitleEnglish = "Help & Support",
                     icon = Icons.AutoMirrored.Filled.Help,
-                    onClick = { viewModel.showMessage("مدد اور سپورٹ: support@daastan.app") },
+                    onClick = {
+                        try {
+                            val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:support@daastan.app")
+                                putExtra(Intent.EXTRA_SUBJECT, "داستان ایپ سپورٹ اور فیڈ بیک")
+                            }
+                            context.startActivity(mailIntent)
+                        } catch (e: Exception) {
+                            viewModel.showMessage("رابطہ ای میل: support@daastan.app")
+                        }
+                    },
                     trailingContent = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -290,7 +315,7 @@ fun SettingsScreen(
                     titleUrdu = "لاگ آؤٹ",
                     subtitleEnglish = "Log Out",
                     icon = Icons.Default.ExitToApp,
-                    onClick = { viewModel.showMessage("لاگ آؤٹ مکمل ہو گیا") },
+                    onClick = { showLogoutDialog = true },
                     trailingContent = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -504,6 +529,249 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
+
+    // -----------------------------------------------------------------
+    // 1. ACCOUNT SETTINGS DIALOG
+    // -----------------------------------------------------------------
+    if (showAccountDialog) {
+        var editName by remember { mutableStateOf(userName) }
+        var editTitle by remember { mutableStateOf(userTitle) }
+        var editEmail by remember { mutableStateOf(userEmail) }
+        var editGoal by remember { mutableStateOf(dailyGoalMinutes.toString()) }
+
+        AlertDialog(
+            onDismissRequest = { showAccountDialog = false },
+            containerColor = MidnightDarkSurface,
+            title = {
+                Text(
+                    text = "اکاؤنٹ اور پروفائل کی ترتیبات",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = GoldAccent
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedTextField(
+                        value = editName,
+                        onValueChange = { editName = it },
+                        label = { Text("نام", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = editTitle,
+                        onValueChange = { editTitle = it },
+                        label = { Text("لقب / اسٹیٹس", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = editEmail,
+                        onValueChange = { editEmail = it },
+                        label = { Text("ای میل پتہ", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = editGoal,
+                        onValueChange = { editGoal = it.filter { ch -> ch.isDigit() } },
+                        label = { Text("روزانہ مطالعہ کا ہدف (منٹ)", fontFamily = UrduFontFamily, color = TextMutedPurple) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = GoldAccent,
+                            unfocusedBorderColor = Color(0xFF382F58),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateProfile(
+                            name = editName.ifBlank { "قاری" },
+                            title = editTitle.ifBlank { "ادبی شوقین" },
+                            email = editEmail.ifBlank { "reader@daastan.app" }
+                        )
+                        val goal = editGoal.toIntOrNull() ?: 30
+                        viewModel.setDailyGoalMinutes(goal)
+                        showAccountDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldAccent,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text("محفوظ کریں", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAccountDialog = false }) {
+                    Text("منسوخ", fontFamily = UrduFontFamily, color = TextMutedPurple)
+                }
+            }
+        )
+    }
+
+    // -----------------------------------------------------------------
+    // 2. AUDIO & TEXT-TO-SPEECH SETTINGS DIALOG
+    // -----------------------------------------------------------------
+    if (showAudioDialog) {
+        AlertDialog(
+            onDismissRequest = { showAudioDialog = false },
+            containerColor = MidnightDarkSurface,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Headphones, contentDescription = null, tint = GoldAccent)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "آڈیو اور اسپیچ کی ترتیبات",
+                        fontFamily = UrduFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = GoldAccent
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(containerColor = MidnightDarkSurfaceElevated),
+                        border = BorderStroke(1.dp, Color(0xFF382F58))
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "اردو ٹیکسٹ ٹو اسپیچ (Android Urdu TTS)",
+                                fontFamily = UrduFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                color = GoldAccent,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "ریڈر اسکرین پر پلے بٹن دبانے سے ناول کا موجودہ صفحہ اردو تلفظ کے ساتھ پڑھا جاتا ہے۔ رفتار اور خودکار صفحہ پلٹنے کی رفتار بھی حسبِ منشا سیٹ کی جا سکتی ہے۔",
+                                fontFamily = UrduFontFamily,
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.85f),
+                                lineHeight = 18.sp
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("زبان:", fontFamily = UrduFontFamily, color = TextMutedPurple, fontSize = 13.sp)
+                        Text("اردو (پاکستان - ur_PK)", fontFamily = UrduFontFamily, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("آٹو اسکرول اسپیڈ:", fontFamily = UrduFontFamily, color = TextMutedPurple, fontSize = 13.sp)
+                        Text("${viewModel.readerSettings.value.autoScrollSpeed}x", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.showMessage("آڈیو سروس فعال ہے")
+                        showAudioDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = GoldAccent, contentColor = Color.Black),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text("ٹھیک ہے", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+
+    // -----------------------------------------------------------------
+    // 3. LOGOUT CONFIRMATION DIALOG
+    // -----------------------------------------------------------------
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            containerColor = MidnightDarkSurface,
+            title = {
+                Text(
+                    text = "لاگ آؤٹ کی تصدیق",
+                    fontFamily = UrduFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = GoldAccent
+                )
+            },
+            text = {
+                Text(
+                    text = "کیا آپ واقعی اپنے اکاؤنٹ سے لاگ آؤٹ کرنا چاہتے ہیں؟ آپ کا آف لائن ڈیٹا اور نوولز محفوظ رہیں گے۔",
+                    fontFamily = UrduFontFamily,
+                    fontSize = 13.sp,
+                    color = Color.White.copy(alpha = 0.85f),
+                    lineHeight = 20.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.showMessage("کامیابی سے لاگ آؤٹ کر دیا گیا")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFB71C1C),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text("ہاں، لاگ آؤٹ کریں", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("منسوخ", fontFamily = UrduFontFamily, color = TextMutedPurple)
+                }
+            }
+        )
     }
 }
 

@@ -113,6 +113,7 @@ import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.UrduFontFamily
 import com.example.ui.viewmodel.NovelViewModel
 import com.example.util.TextPaginator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -268,6 +269,17 @@ fun ReaderScreen(
                         charOffset = currentPage.startCharOffset,
                         progressPercent = progress
                     )
+                }
+            }
+        }
+
+        // Real Auto-scroll / Auto-page turn
+        LaunchedEffect(readerSettings.autoScrollEnabled, readerSettings.autoScrollSpeed, pagerState.currentPage, pages.size) {
+            if (readerSettings.autoScrollEnabled && pages.isNotEmpty() && pagerState.currentPage < pages.size - 1) {
+                val delaySeconds = (15f / readerSettings.autoScrollSpeed.coerceAtLeast(0.5f)).coerceIn(4f, 60f)
+                delay((delaySeconds * 1000).toLong())
+                if (pagerState.currentPage < pages.size - 1) {
+                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
             }
         }
@@ -775,17 +787,42 @@ fun ReaderScreen(
                 onDismiss = { showBookmarkDialog = false }
             )
         }
-    }
 
-    // Reader Appearance Settings Bottom Sheet
-    if (showSettingsSheet) {
-        ReaderSettingsSheet(
-            settings = readerSettings,
-            onSettingsChanged = { updated ->
-                viewModel.updateReaderSettings(updated)
-            },
-            onDismiss = { showSettingsSheet = false }
-        )
+        // Reader Appearance Settings Bottom Sheet
+        if (showSettingsSheet) {
+            val currentPageText = pages.getOrNull(pagerState.currentPage)?.text ?: ""
+            val currentPageNumber = (pagerState.currentPage + 1).coerceAtMost(pages.size.coerceAtLeast(1))
+            ReaderSettingsSheet(
+                settings = readerSettings,
+                currentPageText = currentPageText,
+                currentPageNumber = currentPageNumber,
+                totalPages = pages.size.coerceAtLeast(1),
+                onSettingsChanged = { updated ->
+                    viewModel.updateReaderSettings(updated)
+                },
+                onOpenBookmarks = {
+                    showBookmarkDialog = true
+                },
+                onPrevPage = {
+                    if (pagerState.currentPage > 0) {
+                        coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
+                    } else if (chapter.chapterNumber > 1) {
+                        viewModel.navigateToPreviousChapter(novel.id, chapter.id)
+                    }
+                },
+                onNextPage = {
+                    if (pagerState.currentPage < pages.size - 1) {
+                        coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                    } else if (chapter.chapterNumber < allChapters.size) {
+                        viewModel.navigateToNextChapter(novel.id, chapter.id)
+                    }
+                },
+                onSaveBookmark = {
+                    showBookmarkDialog = true
+                },
+                onDismiss = { showSettingsSheet = false }
+            )
+        }
     }
 
     // Chapters Selector Bottom Sheet

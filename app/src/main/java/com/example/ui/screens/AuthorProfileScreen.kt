@@ -87,7 +87,8 @@ fun AuthorProfileScreen(
         )
 
     val authorNovels = viewModel.getAuthorNovels(author.name)
-    var isFollowing by remember { mutableStateOf(false) }
+    val followedAuthors by viewModel.followedAuthors.collectAsState()
+    val isFollowing = followedAuthors.contains(author.id)
 
     LazyColumn(
         modifier = modifier
@@ -243,8 +244,7 @@ fun AuthorProfileScreen(
                 // Follow Button: "فالو کریں"
                 Button(
                     onClick = {
-                        isFollowing = !isFollowing
-                        viewModel.showMessage(if (isFollowing) "${author.name} کو فالو کر لیا گیا" else "فالو ختم کر دیا گیا")
+                        viewModel.toggleFollowAuthor(author.id)
                     },
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(

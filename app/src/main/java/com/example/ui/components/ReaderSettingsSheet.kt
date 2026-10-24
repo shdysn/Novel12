@@ -71,6 +71,11 @@ import com.example.ui.theme.MidnightDarkSurfaceElevated
 import com.example.ui.theme.TextMutedPurple
 import com.example.ui.theme.UrduFontFamily
 
+import android.speech.tts.TextToSpeech
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import java.util.Locale
+
 /**
  * Screen 4: ٹیکنیکل ریڈر موڈ (Reader Overlay)
  * Strictly matches Screen 4 of the reference mockup in Dark Midnight Purple & Gold.
@@ -79,16 +84,44 @@ import com.example.ui.theme.UrduFontFamily
 @Composable
 fun ReaderSettingsSheet(
     settings: ReaderSettings,
+    currentPageText: String = "",
+    currentPageNumber: Int = 1,
+    totalPages: Int = 1,
     onSettingsChanged: (ReaderSettings) -> Unit,
+    onOpenBookmarks: () -> Unit = {},
+    onPrevPage: () -> Unit = {},
+    onNextPage: () -> Unit = {},
+    onSaveBookmark: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    var autoScrollEnabled by remember { mutableStateOf(false) }
-    var autoScrollSpeed by remember { mutableFloatStateOf(1.0f) }
+    val context = LocalContext.current
+    var tts: TextToSpeech? by remember { mutableStateOf(null) }
     var isAudioPlaying by remember { mutableStateOf(false) }
 
+    DisposableEffect(context) {
+        var localTts: TextToSpeech? = null
+        localTts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val urduLocale = Locale("ur", "PK")
+                val res = localTts?.setLanguage(urduLocale)
+                if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    localTts?.setLanguage(Locale.getDefault())
+                }
+            }
+        }
+        tts = localTts
+        onDispose {
+            localTts.stop()
+            localTts.shutdown()
+        }
+    }
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            tts?.stop()
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MidnightDarkSurface,
         tonalElevation = 8.dp
@@ -291,7 +324,7 @@ fun ReaderSettingsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "آٹو اسکرول",
+                    text = "آٹو اسکرول (Auto Page Turn)",
                     fontFamily = UrduFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
@@ -299,8 +332,8 @@ fun ReaderSettingsSheet(
                 )
 
                 Switch(
-                    checked = autoScrollEnabled,
-                    onCheckedChange = { autoScrollEnabled = it },
+                    checked = settings.autoScrollEnabled,
+                    onCheckedChange = { onSettingsChanged(settings.copy(autoScrollEnabled = it)) },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.Black,
                         checkedTrackColor = GoldAccent
@@ -308,16 +341,17 @@ fun ReaderSettingsSheet(
                 )
             }
 
-            if (autoScrollEnabled) {
+            if (settings.autoScrollEnabled) {
                 Text(
-                    text = "اسپیڈ (Speed Slider)",
+                    text = "اسپیڈ: ${"%.1f".format(settings.autoScrollSpeed)}x (ہر ${((15f / settings.autoScrollSpeed.coerceAtLeast(0.5f)).toInt())} سیکنڈ بعد)",
+                    fontFamily = UrduFontFamily,
                     fontSize = 11.sp,
                     color = TextMutedPurple,
                     modifier = Modifier.align(Alignment.Start)
                 )
                 Slider(
-                    value = autoScrollSpeed,
-                    onValueChange = { autoScrollSpeed = it },
+                    value = settings.autoScrollSpeed,
+                    onValueChange = { onSettingsChanged(settings.copy(autoScrollSpeed = it)) },
                     valueRange = 0.5f..3.0f,
                     modifier = Modifier.fillMaxWidth(),
                     colors = SliderDefaults.colors(
@@ -338,7 +372,11 @@ fun ReaderSettingsSheet(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Button(
-                    onClick = { /* Open bookmarks */ },
+                    onClick = {
+                        tts?.stop()
+                        onDismiss()
+                        onOpenBookmarks()
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MidnightDarkSurfaceElevated,
@@ -355,7 +393,11 @@ fun ReaderSettingsSheet(
                 }
 
                 Button(
-                    onClick = { /* Open bookmark list */ },
+                    onClick = {
+                        tts?.stop()
+                        onDismiss()
+                        onOpenBookmarks()
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MidnightDarkSurfaceElevated,
@@ -372,20 +414,21 @@ fun ReaderSettingsSheet(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Reading Progress Indicator (e.g. 34%)
+            // Reading Progress Indicator (Dynamic percent based on actual pages)
+            val dynamicPercent = if (totalPages > 0) ((currentPageNumber.toFloat() / totalPages) * 100).toInt().coerceIn(0, 100) else 0
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "مطالعہ کی پیشرفت", fontFamily = UrduFontFamily, fontSize = 12.sp, color = TextMutedPurple)
-                Text(text = "34%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = GoldAccent)
+                Text(text = "مطالعہ کی پیشرفت (صفحہ $currentPageNumber از $totalPages)", fontFamily = UrduFontFamily, fontSize = 12.sp, color = TextMutedPurple)
+                Text(text = "$dynamicPercent%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = GoldAccent)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // ---------------------------------------------------------
-            // 7. AUDIO READING BAR: "آڈیو پڑھائی"
+            // 7. AUDIO READING BAR: "آڈیو پڑھائی" (Real Android Urdu TTS)
             // ---------------------------------------------------------
             Card(
                 modifier = Modifier
@@ -404,11 +447,21 @@ fun ReaderSettingsSheet(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(imageVector = Icons.Default.Headphones, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "آڈیو پڑھائی", fontFamily = UrduFontFamily, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
+                            Text(
+                                text = if (isAudioPlaying) "آڈیو پڑھائی جاری ہے..." else "آڈیو پڑھائی (Text-to-Speech)",
+                                fontFamily = UrduFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = if (isAudioPlaying) GoldAccent else Color.White
+                            )
                         }
 
                         IconButton(
-                            onClick = onDismiss,
+                            onClick = {
+                                tts?.stop()
+                                isAudioPlaying = false
+                                onDismiss()
+                            },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(imageVector = Icons.Default.Close, contentDescription = "بند کریں", tint = TextMutedPurple, modifier = Modifier.size(16.dp))
@@ -423,12 +476,24 @@ fun ReaderSettingsSheet(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.Repeat, contentDescription = "Loop", tint = TextMutedPurple, modifier = Modifier.size(20.dp))
+                        // Loop / Replay from start of page
+                        IconButton(onClick = {
+                            if (tts != null && currentPageText.isNotBlank()) {
+                                tts?.stop()
+                                tts?.speak(currentPageText, TextToSpeech.QUEUE_FLUSH, null, "reader_tts")
+                                isAudioPlaying = true
+                            }
+                        }) {
+                            Icon(imageVector = Icons.Default.Repeat, contentDescription = "دوبارہ سنیں", tint = GoldAccent, modifier = Modifier.size(20.dp))
                         }
 
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.SkipPrevious, contentDescription = "Prev", tint = Color.White, modifier = Modifier.size(22.dp))
+                        // Previous Page Audio
+                        IconButton(onClick = {
+                            tts?.stop()
+                            isAudioPlaying = false
+                            onPrevPage()
+                        }) {
+                            Icon(imageVector = Icons.Default.SkipPrevious, contentDescription = "پچھلا صفحہ", tint = Color.White, modifier = Modifier.size(22.dp))
                         }
 
                         // Play / Pause Gold Circle Button
@@ -437,7 +502,16 @@ fun ReaderSettingsSheet(
                                 .size(42.dp)
                                 .clip(CircleShape)
                                 .background(GoldAccent)
-                                .clickable { isAudioPlaying = !isAudioPlaying },
+                                .clickable {
+                                    if (isAudioPlaying) {
+                                        tts?.stop()
+                                        isAudioPlaying = false
+                                    } else {
+                                        val textToRead = currentPageText.ifBlank { "کوئی متن دستیاب نہیں ہے" }
+                                        tts?.speak(textToRead, TextToSpeech.QUEUE_FLUSH, null, "reader_tts")
+                                        isAudioPlaying = true
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -448,12 +522,20 @@ fun ReaderSettingsSheet(
                             )
                         }
 
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.SkipNext, contentDescription = "Next", tint = Color.White, modifier = Modifier.size(22.dp))
+                        // Next Page Audio
+                        IconButton(onClick = {
+                            tts?.stop()
+                            isAudioPlaying = false
+                            onNextPage()
+                        }) {
+                            Icon(imageVector = Icons.Default.SkipNext, contentDescription = "اگلا صفحہ", tint = Color.White, modifier = Modifier.size(22.dp))
                         }
 
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.Bookmark, contentDescription = "Save", tint = TextMutedPurple, modifier = Modifier.size(20.dp))
+                        // Save Bookmark
+                        IconButton(onClick = {
+                            onSaveBookmark()
+                        }) {
+                            Icon(imageVector = Icons.Default.Bookmark, contentDescription = "محفوظ کریں", tint = GoldAccent, modifier = Modifier.size(20.dp))
                         }
                     }
                 }

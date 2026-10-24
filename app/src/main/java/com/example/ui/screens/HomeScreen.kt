@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import com.example.data.model.Novel
 import com.example.data.model.NovelCategory
 import com.example.ui.components.AuthorCard
@@ -81,6 +82,11 @@ fun HomeScreen(
     val trendingNovels by viewModel.trendingNovels.collectAsState()
     val newNovels by viewModel.newNovels.collectAsState()
     val authors by viewModel.authors.collectAsState()
+    val followedAuthors by viewModel.followedAuthors.collectAsState()
+
+    val authorsListState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val latestListState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
 
     val currentReadingNovel = continueReadingNovels.firstOrNull() ?: allNovels.firstOrNull()
 
@@ -189,30 +195,55 @@ fun HomeScreen(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Previous",
-                        tint = GoldAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Next",
-                        tint = GoldAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    IconButton(
+                        onClick = {
+                            val nextIndex = (authorsListState.firstVisibleItemIndex - 1).coerceAtLeast(0)
+                            coroutineScope.launch {
+                                authorsListState.animateScrollToItem(nextIndex)
+                            }
+                        },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "Previous",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            val nextIndex = (authorsListState.firstVisibleItemIndex + 1).coerceAtMost(authors.size - 1)
+                            coroutineScope.launch {
+                                authorsListState.animateScrollToItem(nextIndex)
+                            }
+                        },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Next",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
 
         item {
             LazyRow(
+                state = authorsListState,
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(authors, key = { it.id }) { author ->
                     AuthorCard(
                         author = author,
+                        isFollowing = followedAuthors.contains(author.id),
+                        onFollowClick = {
+                            viewModel.toggleFollowAuthor(author.id)
+                        },
                         onClick = {
                             viewModel.navigateToAuthorDetail(author.id)
                         }
@@ -460,18 +491,39 @@ fun HomeScreen(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Previous",
-                        tint = GoldAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Next",
-                        tint = GoldAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    IconButton(
+                        onClick = {
+                            val nextIndex = (latestListState.firstVisibleItemIndex - 1).coerceAtLeast(0)
+                            coroutineScope.launch {
+                                latestListState.animateScrollToItem(nextIndex)
+                            }
+                        },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "Previous",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            val latestCount = if (newNovels.isNotEmpty()) newNovels.size else allNovels.size
+                            val nextIndex = (latestListState.firstVisibleItemIndex + 1).coerceAtMost((latestCount - 1).coerceAtLeast(0))
+                            coroutineScope.launch {
+                                latestListState.animateScrollToItem(nextIndex)
+                            }
+                        },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Next",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -479,6 +531,7 @@ fun HomeScreen(
         item {
             val latestList = if (newNovels.isNotEmpty()) newNovels else allNovels.takeLast(4)
             LazyRow(
+                state = latestListState,
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {

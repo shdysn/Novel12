@@ -140,6 +140,46 @@ class NovelRepository(private val context: Context) {
         prefs.edit().putBoolean("pref_notif", newVal).apply()
     }
 
+    // Followed Authors Set (Persisted)
+    private val _followedAuthors = MutableStateFlow<Set<String>>(
+        prefs.getStringSet("followed_author_ids", emptySet()) ?: emptySet()
+    )
+    val followedAuthors: StateFlow<Set<String>> = _followedAuthors.asStateFlow()
+
+    fun toggleFollowAuthor(authorId: String): Boolean {
+        val current = _followedAuthors.value.toMutableSet()
+        val nowFollowing = if (current.contains(authorId)) {
+            current.remove(authorId)
+            false
+        } else {
+            current.add(authorId)
+            true
+        }
+        _followedAuthors.value = current
+        prefs.edit().putStringSet("followed_author_ids", current).apply()
+        return nowFollowing
+    }
+
+    // Novel User Reviews (In-memory & interactive)
+    private val _novelReviews = MutableStateFlow<Map<String, List<NovelUserReview>>>(emptyMap())
+    val novelReviews: StateFlow<Map<String, List<NovelUserReview>>> = _novelReviews.asStateFlow()
+
+    fun addReview(novelId: String, reviewerName: String, rating: Int, comment: String) {
+        val now = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val review = NovelUserReview(
+            novelId = novelId,
+            userName = reviewerName.ifBlank { userName.value },
+            rating = rating.coerceIn(1, 5),
+            comment = comment.trim(),
+            createdAt = now
+        )
+        val currentMap = _novelReviews.value.toMutableMap()
+        val list = currentMap[novelId]?.toMutableList() ?: mutableListOf()
+        list.add(0, review)
+        currentMap[novelId] = list
+        _novelReviews.value = currentMap
+    }
+
     init {
         loadSettings()
         loadSupabaseConfig()
@@ -1375,3 +1415,12 @@ class NovelRepository(private val context: Context) {
         entities.map { it.toDomainModel() }
     }
 }
+
+data class NovelUserReview(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val novelId: String,
+    val userName: String,
+    val rating: Int,
+    val comment: String,
+    val createdAt: String
+)

@@ -60,6 +60,8 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
     val userEmail: StateFlow<String> = repository.userEmail
     val dailyGoalMinutes: StateFlow<Int> = repository.dailyGoalMinutes
     val isVipMember: StateFlow<Boolean> = repository.isVipMember
+    val followedAuthors: StateFlow<Set<String>> = repository.followedAuthors
+    val novelReviews = repository.novelReviews
 
     // Specialized Novel Sections for Home Screen
     val continueReadingNovels: StateFlow<List<Novel>> = repository.novels.map { list ->
@@ -197,6 +199,21 @@ class NovelViewModel(application: Application) : AndroidViewModel(application) {
             val status = if (novel.isFavorite) "پسندیدہ میں شامل کر لیا گیا" else "پسندیدہ سے ہٹا دیا گیا"
             showMessage(status)
         }
+    }
+
+    fun toggleFollowAuthor(authorId: String) {
+        val nowFollowing = repository.toggleFollowAuthor(authorId)
+        val msg = if (nowFollowing) "آپ نے اس مصنف کو فالو کر لیا ہے" else "مصنف کو ان فالو کر دیا گیا"
+        showMessage(msg)
+    }
+
+    fun addNovelReview(novelId: String, reviewerName: String, rating: Int, comment: String) {
+        if (comment.isBlank()) {
+            showMessage("براہ کرم تبصرہ درج کریں")
+            return
+        }
+        repository.addReview(novelId, reviewerName, rating, comment)
+        showMessage("آپ کا تبصرہ کامیابی سے شائع ہو گیا!")
     }
 
     fun saveBookmark(
